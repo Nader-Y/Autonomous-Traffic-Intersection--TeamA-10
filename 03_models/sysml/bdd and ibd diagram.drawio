@@ -1,0 +1,425 @@
+<mxfile host="app.diagrams.net" agent="Claude" pages="3">
+
+  <!-- ═══════════════════════════════════════
+       PAGE 1 — Data ingestion & state fusion
+       ═══════════════════════════════════════ -->
+  <diagram name="Data ingestion layer" id="diagram-ingestion">
+    <mxGraphModel dx="1200" dy="800" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sensor" value="&lt;b&gt;Sensor subsystem&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#0F6E56&quot;&gt;LiDAR · Camera · Radar · GPS/IMU&lt;/font&gt;" style="rounded=1;arcSize=8;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="40" width="170" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v2x" value="&lt;b&gt;V2X interface&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#0F6E56&quot;&gt;V2V · V2I · intent sharing&lt;/font&gt;" style="rounded=1;arcSize=8;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="255" y="40" width="170" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="infra" value="&lt;b&gt;Infrastructure / edge&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#0F6E56&quot;&gt;RSU · HD map · model updates&lt;/font&gt;" style="rounded=1;arcSize=8;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="40" width="170" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="fusion" value="&lt;b&gt;State fusion &amp;amp; situation awareness&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#534AB7&quot;&gt;Sensor fusion · object tracking · occupancy estimation&lt;/font&gt;" style="rounded=1;arcSize=6;fillColor=#EEEDFE;strokeColor=#534AB7;fontColor=#3C3489;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="220" width="340" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="arb" value="&lt;b&gt;Traffic arbitration unit&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#993C1D&quot;&gt;Priority · conflict resolution&lt;/font&gt;" style="rounded=1;arcSize=8;fillColor=#FAECED;strokeColor=#993C1D;fontColor=#712B13;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="380" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="sched" value="&lt;b&gt;Scheduler&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#993C1D&quot;&gt;Time-slots · queue · throughput&lt;/font&gt;" style="rounded=1;arcSize=8;fillColor=#FAECED;strokeColor=#993C1D;fontColor=#712B13;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="380" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="SensorDataBundle&#xa;10–100 Hz, PTP-synced" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#1D9E75;fontColor=#3D3D3A;fontSize=10;align=right;verticalAlign=middle;labelPosition=left;verticalLabelPosition=middle;" edge="1" source="sensor" target="fusion" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="152" />
+              <mxPoint x="260" y="152" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="V2XStateBundle&#xa;SAE J2735, ≤50 ms" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#1D9E75;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" edge="1" source="v2x" target="fusion" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="HD map · rules&#xa;30 s refresh" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#1D9E75;fontColor=#3D3D3A;fontSize=10;align=right;verticalAlign=middle;labelPosition=left;verticalLabelPosition=middle;" edge="1" source="infra" target="fusion" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="565" y="152" />
+              <mxPoint x="460" y="152" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="WorldModel&#xa;20 Hz · ≤20 ms budget" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#534AB7;fontColor=#3D3D3A;fontSize=10;align=right;verticalAlign=middle;labelPosition=left;verticalLabelPosition=middle;" edge="1" source="fusion" target="arb" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="310" />
+              <mxPoint x="170" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" value="VehicleStateList&#xa;20 Hz · conflict matrix" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#534AB7;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" edge="1" source="fusion" target="sched" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="310" />
+              <mxPoint x="510" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note1" value="outputs continue in diagram 2 → Command, control &amp;amp; safety layer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#5F5E5A;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="130" y="458" width="420" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="" style="dashed=1;dashPattern=3 3;strokeColor=#993C1D;endArrow=open;endFill=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="170" y="436" as="sourcePoint" />
+            <mxPoint x="170" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" value="" style="dashed=1;dashPattern=3 3;strokeColor=#993C1D;endArrow=open;endFill=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="436" as="sourcePoint" />
+            <mxPoint x="510" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg1a" value="" style="strokeColor=#1D9E75;endArrow=open;endFill=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="42" y="530" as="sourcePoint" />
+            <mxPoint x="70" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg1b" value="sensor / state data" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#3D3D3A;" vertex="1" parent="1">
+          <mxGeometry x="75" y="522" width="120" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2a" value="" style="strokeColor=#534AB7;endArrow=open;endFill=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="530" as="sourcePoint" />
+            <mxPoint x="248" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg2b" value="fused world model" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#3D3D3A;" vertex="1" parent="1">
+          <mxGeometry x="253" y="522" width="120" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3a" value="" style="dashed=1;dashPattern=3 3;strokeColor=#993C1D;endArrow=open;endFill=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="530" as="sourcePoint" />
+            <mxPoint x="408" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg3b" value="continues below" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#3D3D3A;" vertex="1" parent="1">
+          <mxGeometry x="413" y="522" width="120" height="16" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ════════════════════════════════════════════
+       PAGE 2 — Command, control, and safety layer
+       ════════════════════════════════════════════ -->
+  <diagram name="Command, control &amp; safety layer" id="diagram-command">
+    <mxGraphModel dx="1144" dy="624" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="arb2" parent="1" style="rounded=1;arcSize=8;fillColor=#FAECED;strokeColor=#993C1D;fontColor=#712B13;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" value="&lt;b&gt;Traffic arbitration unit&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#993C1D&quot;&gt;Priority · conflict resolution&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="220" x="60" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="sched2" parent="1" style="rounded=1;arcSize=8;fillColor=#FAECED;strokeColor=#993C1D;fontColor=#712B13;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" value="&lt;b&gt;Scheduler&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#993C1D&quot;&gt;Time-slots · queue · throughput&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="220" x="400" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl" parent="1" style="rounded=1;arcSize=6;fillColor=#EEEDFE;strokeColor=#534AB7;fontColor=#3C3489;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" value="&lt;b&gt;Intersection controller&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#534AB7&quot;&gt;Decision logic · trajectory approval · emergency preemption&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="340" x="170" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="safety" parent="1" style="rounded=1;arcSize=8;fillColor=#FAEEDA;strokeColor=#854F0B;fontColor=#633806;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" value="&lt;b&gt;Safety &amp;amp; monitoring&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#854F0B&quot;&gt;Watchdog · fail-safe · logs&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="160" x="30" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="vif" parent="1" style="rounded=1;arcSize=8;fillColor=#E6F1FB;strokeColor=#185FA5;fontColor=#0C447C;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" value="&lt;b&gt;Vehicle interface&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#185FA5&quot;&gt;CAV · partial · emergency&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="160" x="490" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="env" parent="1" style="rounded=1;arcSize=6;fillColor=#F1EFE8;strokeColor=#5F5E5A;fontColor=#444441;fontSize=11;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;" value="&lt;b&gt;Environment constraints&lt;/b&gt;&lt;br/&gt;&lt;font color=&quot;#5F5E5A&quot;&gt;Intersection geometry · vehicle dynamics · safety bounds · V2X latency · timing&lt;/font&gt;" vertex="1">
+          <mxGeometry height="56" width="430" x="30" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" edge="1" parent="1" source="arb2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#993C1D;fontColor=#3D3D3A;fontSize=10;align=right;verticalAlign=middle;labelPosition=left;verticalLabelPosition=middle;" target="ctrl" value="ArbitrationDecision&#xa;≤30 ms after WorldModel">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="170" y="140" />
+              <mxPoint x="260" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c2" edge="1" parent="1" source="sched2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#993C1D;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" target="ctrl" value="CrossingSchedule&#xa;MovementAuthority&#xa;5 s horizon · 500 ms replan">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="140" />
+              <mxPoint x="420" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c3" edge="1" parent="1" source="safety" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#854F0B;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" target="ctrl" value="HealthReport · FailSafeCmd">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="110" y="290" />
+              <mxPoint x="170" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c4" edge="1" parent="1" source="ctrl" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#854F0B;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" target="safety" value="HeartbeatAck · 100 ms watchdog">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="175" y="310" />
+              <mxPoint x="85" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c5" edge="1" parent="1" source="ctrl" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#185FA5;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" target="vif" value="VehicleCommand&#xa;DSRC/C-V2X · ack unicast">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="310" />
+              <mxPoint x="570" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c6" edge="1" parent="1" source="env" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=4 3;strokeColor=#5F5E5A;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;exitX=0.25;exitY=0;entryX=0.5;entryY=1;" target="safety" value="separation model">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" edge="1" parent="1" source="env" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=4 3;strokeColor=#5F5E5A;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" target="ctrl" value="operational limits">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="390" />
+              <mxPoint x="280" y="276" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c8" edge="1" parent="1" source="env" style="edgeStyle=orthogonalEdgeStyle;dashed=1;dashPattern=4 3;strokeColor=#5F5E5A;fontColor=#3D3D3A;fontSize=10;align=left;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;" target="sched2" value="timing / latency bounds">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="370" y="350" />
+              <mxPoint x="460" y="350" />
+              <mxPoint x="460" y="86" />
+              <mxPoint x="510" y="86" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="la1" edge="1" parent="1" style="strokeColor=#993C1D;endArrow=open;endFill=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="42" y="618" as="sourcePoint" />
+            <mxPoint x="70" y="618" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="la2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#3D3D3A;" value="control command" vertex="1">
+          <mxGeometry height="16" width="130" x="75" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="lb1" edge="1" parent="1" style="strokeColor=#854F0B;endArrow=open;endFill=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="618" as="sourcePoint" />
+            <mxPoint x="238" y="618" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lb2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#3D3D3A;" value="safety / monitoring" vertex="1">
+          <mxGeometry height="16" width="130" x="243" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="lc1" edge="1" parent="1" style="dashed=1;dashPattern=4 3;strokeColor=#5F5E5A;endArrow=open;endFill=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="618" as="sourcePoint" />
+            <mxPoint x="408" y="618" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lc2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#3D3D3A;" value="constraint (config-time)" vertex="1">
+          <mxGeometry height="16" width="150" x="413" y="610" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ═══════════════════════════
+       PAGE 3 — Autonomous Intersection BDD
+       ═══════════════════════════ -->
+  <diagram id="d1661483af6745e4a650680a5682221b" name="Autonomous Intersection BDD">
+    <mxGraphModel dx="2734" dy="592" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontStyle=1;fontSize=20;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Autonomous Traffic-Lightless Intersection Control System&lt;/b&gt;" vertex="1">
+          <mxGeometry height="70" width="660" x="410" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Sensor Subsystem&lt;/b&gt;&lt;hr&gt;• LiDAR&lt;br&gt;• Camera&lt;br&gt;• Radar&lt;br&gt;• GPS/IMU&lt;br&gt;• Environmental Sensors&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="210" width="220" x="30" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;State Fusion &amp;amp;&lt;br&gt;Situation Awareness&lt;/b&gt;&lt;hr&gt;• Sensor Fusion&lt;br&gt;• Object Detection&lt;br&gt;• Tracking&lt;br&gt;• Scene Understanding&lt;br&gt;• Occupancy / Conflict-Zone&lt;br&gt;&amp;nbsp;&amp;nbsp;Estimation" vertex="1">
+          <mxGeometry height="210" width="245" x="315" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Communication /&lt;br&gt;V2X Interface&lt;/b&gt;&lt;hr&gt;• V2V&lt;br&gt;• V2I&lt;br&gt;• Vehicle State Exchange&lt;br&gt;• Intent Sharing&lt;br&gt;• Infrastructure Messages" vertex="1">
+          <mxGeometry height="210" width="230" x="640" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;b&gt;&lt;br&gt;Vehicle Interface&lt;/b&gt;&lt;hr&gt;• Connected Autonomous Vehicles&lt;br&gt;• Human-Driven / Partially&lt;br&gt;&amp;nbsp;&amp;nbsp;Connected Vehicles&lt;br&gt;• Emergency Vehicles&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="210" width="260" x="960" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Infrastructure /&lt;br&gt;Edge Platform&lt;/b&gt;&lt;hr&gt;• RSU / Edge Compute&lt;br&gt;• Local Database / Map&lt;br&gt;• Model Update Interface&lt;br&gt;• External Services" vertex="1">
+          <mxGeometry height="210" width="240" x="1300" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Traffic Arbitration Unit&lt;/b&gt;&lt;hr&gt;• Right-of-Way Management&lt;br&gt;• Conflict Resolution&lt;br&gt;• Priority Assignment&lt;br&gt;• Rule Evaluation" vertex="1">
+          <mxGeometry height="155" width="280" x="130" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Scheduler&lt;/b&gt;&lt;hr&gt;• Crossing Sequence Planning&lt;br&gt;• Time-Slot Allocation&lt;br&gt;• Queue Management&lt;br&gt;• Throughput Optimization&lt;br&gt;• Fairness Handling" vertex="1">
+          <mxGeometry height="155" width="280" x="460" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Safety &amp;amp; Monitoring&lt;/b&gt;&lt;hr&gt;• Collision Risk Check&lt;br&gt;• Deadlock Prevention&lt;br&gt;• Fail-Safe Handling&lt;br&gt;• Health Monitoring&lt;br&gt;• Logging / Diagnostics" vertex="1">
+          <mxGeometry height="160" width="230" x="20" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Intersection Controller&lt;/b&gt;&lt;hr&gt;• Decision Logic&lt;br&gt;• Trajectory Approval&lt;br&gt;• Speed / Stop / Go Commands&lt;br&gt;• Coordination Control&lt;br&gt;• Emergency Preemption" vertex="1">
+          <mxGeometry height="150" width="430" x="330" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;fontSize=14;labelBackgroundColor=none;" value="&amp;lt;&amp;lt;block&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;Environment Constraints&lt;/b&gt;&lt;hr&gt;• Intersection Geometry &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; • Vehicle Dynamics &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; • Safe Separation &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; • V2X Latency &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; • Turning-Speed Limits" vertex="1">
+          <mxGeometry height="85" width="1070" x="190" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="shape=rhombus;labelBackgroundColor=none;" value="" vertex="1">
+          <mxGeometry height="15" width="20" x="760" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="14" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;labelBackgroundColor=none;fontColor=default;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="769.62" y="80" as="sourcePoint" />
+            <mxPoint x="769.62" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;labelBackgroundColor=none;fontColor=default;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="130" y="120" as="sourcePoint" />
+            <mxPoint x="1510" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;entryX=0.445;entryY=0.005;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="128" y="120" as="sourcePoint" />
+            <mxPoint x="130" y="125" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="17" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;" target="4" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="438" y="120" as="sourcePoint" />
+            <mxPoint x="435" y="125" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="18" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;entryX=0.653;entryY=0.012;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="790" y="120" as="sourcePoint" />
+            <mxPoint x="790" y="125" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="19" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;labelBackgroundColor=none;fontColor=default;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1160" y="120" as="sourcePoint" />
+            <mxPoint x="1160" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="20" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeWidth=2;entryX=0.829;entryY=0.011;entryDx=0;entryDy=0;entryPerimeter=0;curved=0;labelBackgroundColor=none;fontColor=default;" target="7" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1499" y="120" as="sourcePoint" />
+            <mxPoint x="1500" y="125" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="21" edge="1" parent="1" source="3" style="endArrow=block;html=1;rounded=0;strokeWidth=2;labelBackgroundColor=none;fontColor=default;exitX=1.002;exitY=0.535;exitDx=0;exitDy=0;exitPerimeter=0;" target="4" value="sensor&lt;br&gt;data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="22" edge="1" parent="1" source="5" style="endArrow=block;html=1;rounded=0;strokeWidth=2;labelBackgroundColor=none;fontColor=default;entryX=1.005;entryY=0.54;entryDx=0;entryDy=0;entryPerimeter=0;" target="4" value="V2X state /&lt;br&gt;intent data">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="570" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="23" edge="1" parent="1" source="5" style="startArrow=block;endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;labelBackgroundColor=none;fontColor=default;" target="6" value="V2X data&lt;br&gt;exchange">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="24" edge="1" parent="1" source="6" style="startArrow=block;endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;labelBackgroundColor=none;fontColor=default;" target="7" value="V2I link /&lt;br&gt;messages">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="25" edge="1" parent="1" source="4" style="endArrow=block;html=1;rounded=0;strokeWidth=2;exitX=0.053;exitY=0.998;exitDx=0;exitDy=0;exitPerimeter=0;labelBackgroundColor=none;fontColor=default;" value="global&lt;br&gt;intersection&lt;br&gt;state">
+          <mxGeometry relative="1" x="-0.3667" y="-39" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="327" y="340" as="sourcePoint" />
+            <mxPoint x="330" y="420" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="26" edge="1" parent="1" source="4" style="endArrow=block;html=1;rounded=0;strokeWidth=2;exitX=0.94;exitY=0.998;exitDx=0;exitDy=0;exitPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="9" value="state data">
+          <mxGeometry relative="1" x="-0.1817" y="-35" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="545" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="27" edge="1" parent="1" source="8" style="endArrow=block;html=1;rounded=0;strokeWidth=2;exitX=0.75;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=none;fontColor=default;" value="priority rules /&lt;br&gt;conflict decision">
+          <mxGeometry relative="1" x="-0.2474" y="-51" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="340" y="570" as="sourcePoint" />
+            <mxPoint x="340" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="28" edge="1" parent="1" source="9" style="endArrow=block;html=1;rounded=0;strokeWidth=2;exitX=0.295;exitY=0.985;exitDx=0;exitDy=0;exitPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="11" value="crossing&lt;br&gt;schedule">
+          <mxGeometry relative="1" x="0.0132" y="-33" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="550" y="570" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="29" edge="1" parent="1" source="9" style="endArrow=block;html=1;rounded=0;strokeWidth=2;entryX=1;entryY=0.25;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;" target="11" value="permission /&lt;br&gt;speed / stop&lt;br&gt;messages">
+          <mxGeometry relative="1" x="-0.0131" y="40" as="geometry">
+            <mxPoint y="-1" as="offset" />
+            <Array as="points">
+              <mxPoint x="790" y="490" />
+              <mxPoint x="790" y="718" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="30" edge="1" parent="1" source="11" style="endArrow=block;html=1;rounded=0;strokeWidth=2;entryX=0.459;entryY=0.998;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="6" value="commands /&lt;br&gt;advisories">
+          <mxGeometry relative="1" x="0.0037" y="-40" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1080" y="753" />
+              <mxPoint x="1080" y="430" />
+            </Array>
+            <mxPoint x="1118" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="31" edge="1" parent="1" source="7" style="endArrow=block;html=1;rounded=0;strokeWidth=2;entryX=1;entryY=0.75;entryDx=0;entryDy=0;exitX=0.071;exitY=0.998;exitDx=0;exitDy=0;exitPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="11" value="map / data / updates">
+          <mxGeometry relative="1" x="0.082" y="20" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1320" y="790" />
+              <mxPoint x="930" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="32" edge="1" parent="1" source="10" style="startArrow=block;endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;labelBackgroundColor=none;fontColor=default;" target="11" value="status /&lt;br&gt;health">
+          <mxGeometry relative="1" x="-0.0067" y="22" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="33" edge="1" parent="1" source="12" style="endArrow=block;html=1;rounded=0;strokeWidth=2;exitX=0;exitY=0.5;exitDx=0;exitDy=0;labelBackgroundColor=none;fontColor=default;" value="geometry /&lt;br&gt;dynamics /&lt;br&gt;safety bounds">
+          <mxGeometry relative="1" x="0.0834" y="32" as="geometry">
+            <mxPoint x="22" y="30" as="offset" />
+            <Array as="points">
+              <mxPoint x="60" y="943" />
+              <mxPoint x="60" y="880" />
+            </Array>
+            <mxPoint x="60" y="830" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="34" edge="1" parent="1" source="12" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;exitX=0.15;exitY=0.01;exitDx=0;exitDy=0;exitPerimeter=0;labelBackgroundColor=none;fontColor=default;" value="timing /&lt;br&gt;latency bounds">
+          <mxGeometry relative="1" x="0.1951" y="40" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="350" y="832" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="35" edge="1" parent="1" source="12" style="endArrow=block;html=1;rounded=0;strokeWidth=2;dashed=1;exitX=0.366;exitY=0.035;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.587;entryY=1.017;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="11" value="operational&lt;br&gt;limits">
+          <mxGeometry relative="1" x="0.2117" y="32" as="geometry">
+            <mxPoint y="-1" as="offset" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="36" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;strokeWidth=2;curved=0;endFill=0;entryX=0.85;entryY=0.99;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=none;fontColor=default;" target="10" value="fail-safe stop / warning">
+          <mxGeometry relative="1" x="0.1429" y="1070" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="216" y="900" as="sourcePoint" />
+            <mxPoint x="1260" y="830" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="37" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;dashed=1;fontSize=14;labelBackgroundColor=none;" value="&lt;b&gt;Legend&lt;/b&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ◆ Composition (whole-part) &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ─ Association / Data Flow &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ⟷ Data Exchange (Bidirectional) &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ⇠⇢ Monitoring / Oversight" vertex="1">
+          <mxGeometry height="55" width="960" x="250" y="1000" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+</mxfile>
