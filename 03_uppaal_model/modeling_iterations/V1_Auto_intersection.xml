@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>
+
+// ================= GLOBAL TIME =================
+clock t_tr1, t_tr2, t_tr3, t_tr4, t_tr5, t_tr6, t_tr7, t_tr8;
+clock wait_clk, exec_clk, comm_clk, sched_clk, switch_clk;
+
+// ================= CONSTANTS =================
+const int MAX_WAIT = 20;
+const int SLOT_TIME = 5;
+const int SAFE_GAP = 1;
+const int SCHED_DEADLINE = 2;
+const int SENSOR_PERIOD = 1;
+
+// ================= SYSTEM STATE =================
+int queue_len = 0;
+int emergency_flag = 0;
+int request_pending = 0;
+int schedule_valid = 0;
+int system_busy = 0;
+
+// ================= CHANNELS =================
+broadcast chan vehicle_arrive;
+broadcast chan request_next;
+broadcast chan schedule_propose;
+broadcast chan schedule_accept;
+broadcast chan schedule_reject;
+broadcast chan reserve_slot;
+broadcast chan execute;
+urgent broadcast chan emergency_detect;   // broadcast urgent chan emergency_detect;  unsafe  gives syntax error
+broadcast chan priority_override;
+
+</declaration>
+	<template>
+		<name>VehicleGenerator</name>
+		<location id="id0" x="-195" y="0">
+			<name x="-238" y="-34">Idle</name>
+		</location>
+		<location id="id1" x="200" y="0">
+			<name x="190" y="-30">Generate</name>
+		</location>
+		<location id="id2" x="-8" y="-170">
+			<name x="-18" y="-200">SendRequest</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id3">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-102" y="21">t_tr6 &gt;= SENSOR_PERIOD</label>
+			<label kind="assignment" x="-178" y="51">t_tr6 = 0, wait_clk = 0, request_pending = 1</label>
+		</transition>
+		<transition id="id4">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="assignment" x="85" y="-136">queue_len = queue_len + 1, t_tr1 = 0</label>
+		</transition>
+		<transition id="id5">
+			<source ref="id2"/>
+			<target ref="id0"/>
+		</transition>
+	</template>
+	<template>
+		<name>QueueManager</name>
+		<location id="id6" x="-153" y="195">
+			<name x="-221" y="153">Waiting</name>
+		</location>
+		<location id="id7" x="200" y="200">
+			<name x="190" y="170">Enqueue</name>
+		</location>
+		<location id="id8" x="25" y="34">
+			<name x="15" y="4">SelectNext</name>
+		</location>
+		<init ref="id6"/>
+		<transition id="id9">
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="assignment" x="-34" y="204">wait_clk = 0</label>
+		</transition>
+		<transition id="id10">
+			<source ref="id7"/>
+			<target ref="id8"/>
+			<label kind="guard" x="102" y="85">wait_clk &lt;= MAX_WAIT</label>
+		</transition>
+		<transition id="id11">
+			<source ref="id8"/>
+			<target ref="id6"/>
+		</transition>
+	</template>
+	<template>
+		<name>Scheduler</name>
+		<location id="id12" x="-102" y="399">
+			<name x="-178" y="365">Idle</name>
+		</location>
+		<location id="id13" x="-102" y="212">
+			<name x="-247" y="195">ComputeSchedule</name>
+		</location>
+		<location id="id14" x="603" y="221">
+			<name x="637" y="204">ProposeSchedule</name>
+		</location>
+		<location id="id15" x="600" y="400">
+			<name x="654" y="374">WaitValidation</name>
+		</location>
+		<init ref="id12"/>
+		<transition id="id16">
+			<source ref="id12"/>
+			<target ref="id13"/>
+			<label kind="assignment" x="-229" y="297">sched_clk = 0</label>
+		</transition>
+		<transition id="id17">
+			<source ref="id13"/>
+			<target ref="id14"/>
+			<label kind="guard" x="34" y="187">queue_len &gt; 0 &amp;&amp; sched_clk &lt;= SCHED_DEADLINE</label>
+		</transition>
+		<transition id="id18">
+			<source ref="id14"/>
+			<target ref="id15"/>
+			<label kind="assignment" x="603" y="306">t_tr1 = 0</label>
+		</transition>
+		<transition id="id19">
+			<source ref="id15"/>
+			<target ref="id12"/>
+			<label kind="assignment" x="102" y="408">queue_len = queue_len - 1, t_tr2 = 0</label>
+		</transition>
+		<transition id="id20">
+			<source ref="id15"/>
+			<target ref="id13"/>
+		</transition>
+	</template>
+	<template>
+		<name>IntersectionController</name>
+		<location id="id21" x="-110" y="603">
+			<name x="-161" y="569">Free</name>
+		</location>
+		<location id="id22" x="-110" y="399">
+			<name x="-221" y="365">ReserveSlot</name>
+		</location>
+		<location id="id23" x="229" y="399">
+			<name x="263" y="374">Execute</name>
+		</location>
+		<location id="id24" x="229" y="603">
+			<name x="244" y="573">Release</name>
+		</location>
+		<init ref="id21"/>
+		<transition id="id25">
+			<source ref="id21"/>
+			<target ref="id22"/>
+			<label kind="assignment" x="-229" y="484">exec_clk = 0</label>
+		</transition>
+		<transition id="id26">
+			<source ref="id22"/>
+			<target ref="id23"/>
+			<label kind="assignment" x="-102" y="365">schedule_valid = 1, switch_clk = 0</label>
+		</transition>
+		<transition id="id27">
+			<source ref="id23"/>
+			<target ref="id24"/>
+			<label kind="guard" x="246" y="493">exec_clk &lt;= SLOT_TIME</label>
+		</transition>
+		<transition id="id28">
+			<source ref="id24"/>
+			<target ref="id21"/>
+			<label kind="assignment" x="-85" y="612">schedule_valid = 0, switch_clk = 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>EmergencyHandler</name>
+		<location id="id29" x="0" y="800">
+			<name x="-76" y="824">Normal</name>
+		</location>
+		<location id="id30" x="0" y="561">
+			<name x="-144" y="527">DetectEmergency</name>
+		</location>
+		<location id="id31" x="603" y="561">
+			<name x="603" y="527">Override</name>
+		</location>
+		<location id="id32" x="600" y="800">
+			<name x="578" y="824">PrioritySchedule</name>
+		</location>
+		<init ref="id29"/>
+		<transition id="id33">
+			<source ref="id29"/>
+			<target ref="id30"/>
+			<label kind="guard" x="-297" y="663">comm_clk &gt;= 3</label>
+			<label kind="assignment" x="-399" y="705">comm_clk = 0, emergency_flag = 1, t_tr5 = 0</label>
+		</transition>
+		<transition id="id34">
+			<source ref="id30"/>
+			<target ref="id31"/>
+			<label kind="assignment" x="255" y="535">t_tr5 = 0</label>
+		</transition>
+		<transition id="id35">
+			<source ref="id31"/>
+			<target ref="id32"/>
+		</transition>
+		<transition id="id36">
+			<source ref="id32"/>
+			<target ref="id29"/>
+			<label kind="assignment" x="187" y="807">emergency_flag = 0,comm_clk = 0</label>
+		</transition>
+	</template>
+	<system>
+system VehicleGenerator, QueueManager, Scheduler, IntersectionController, EmergencyHandler;</system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] (IntersectionController.Execute imply schedule_valid == 1)</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] not (IntersectionController.Execute and schedule_valid == 0)</formula>
+			<comment/>
+		</query>
+	</queries>
+</nta>

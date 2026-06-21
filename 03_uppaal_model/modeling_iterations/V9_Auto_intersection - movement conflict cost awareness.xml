@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// ================= MOVE → QUADRANT REQUIREMENTS =================
+// M1: Q2 + Q3
+// M2: Q4 + Q1
+// M3: Q4 + Q3
+// M4: Q2 + Q1
+
+// M5: Q2 + Q1
+// M6: Q4 + Q3
+// M7: Q4 + Q3
+// M8: Q2 + Q1
+
+// M9:  Q2 + Q3
+// M10: Q2 + Q3
+// M11: Q4 + Q1
+// M12: Q4 + Q1
+
+// ================= MOVEMENT → QUADRANT MAP =================
+// Each move defines required exclusive spatial resources
+
+const int M1 = 1;   // N→S
+const int M2 = 2;   // S→N
+const int M3 = 3;   // E→W
+const int M4 = 4;   // W→E
+
+const int M5 = 5;   // N→E
+const int M6 = 6;   // E→S
+const int M7 = 7;   // S→W
+const int M8 = 8;   // W→N
+
+const int M9  = 9;  // N→W
+const int M10 = 10; // W→S
+const int M11 = 11; // S→E
+const int M12 = 12; // E→N
+
+// ================= SCHEDULER STATE =================
+// rotates through M1–M12 safely
+//int moveIndex = 1;
+// ================= TIME =================
+clock t_tr1, t_tr2, t_tr3, t_tr4, t_tr5, t_tr6, t_tr7, t_tr8;
+clock wait_clk, exec_clk, comm_clk, sched_clk, switch_clk;
+
+// ================= CONSTANTS =================
+const int MAX_WAIT = 100;
+const int SLOT_TIME = 5;
+const int SCHED_DEADLINE = 2;
+const int SENSOR_PERIOD = 1;
+
+// ================= Z2 QUADRANTS =================
+bool Q1 = false;
+bool Q2 = false;
+bool Q3 = false;
+bool Q4 = false;
+
+// ================= STATE =================
+int[0,MAX_WAIT] queue_len = 0;         // vehicles waiting for service (not executing) -queue_len can never be less than 0+q ueue_len can never be greater than MAX_WAIT
+int emergency_flag = 0;
+bool system_busy = false;
+bool has_proposal;
+int selectedVehicle = -1;
+int generatedMove = 1;
+int requestedVehicle = -1;
+int vehicleRequest[4];
+bool requestPending[4];
+// ================= CHANNELS =================
+broadcast chan vehicle_arrive;
+broadcast chan request_next;
+
+broadcast chan schedule_propose;
+broadcast chan schedule_accept;
+broadcast chan schedule_reject;
+
+broadcast chan reserve_slot;
+broadcast chan execute;
+
+urgent broadcast chan emergency_detect;
+broadcast chan priority_override;
+
+bool emergency_active = false;
+const int MAX_VEHICLES = 4;
+
+int vehicleMove[MAX_VEHICLES];
+bool vehicleActive[MAX_VEHICLES];
+int generatedVehicle = 0;
+
+// Round-robin selection:
+// 1) pick first available vehicle starting from rrIndex
+// 2) then rotate rrIndex so next cycle starts from next vehicle
+// ensures fairness and prevents starvation
+int rrIndex = 0;
+
+int waitTime[4];
+
+// ================= WAIT TIME AGING =================
+// Each scheduling cycle increases waiting time for all vehicles.
+// This models starvation prevention by prioritizing older requests.
+//
+// ================= SCHEDULER DECISION =================
+// selectedVehicle = Round-Robin scan starting from rrIndex
+// rrIndex is then rotated to ensure fairness across cycles
+//
+// Combined effect:
+// - RR ensures fairness in selection order
+// - waitTime tracks how long each request has been waiting
+
+// Conflict cost of each vehicle request.
+// Higher cost = movement is less preferred by scheduler.
+// Simple conflict heuristic:
+// Straight movements -&gt; cost 1
+// Turning movements -&gt; cost 2
+int cost[4];
+int score[4];</declaration>
+	<template>
+		<name>VehicleGenerator</name>
+		<location id="id0" x="4488" y="1394">
+			<name x="4444" y="1364">Idle</name>
+		</location>
+		<location id="id1" x="5576" y="1394">
+			<name x="5585" y="1360">Generate</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id2">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="4955" y="1309">queue_len &lt; MAX_WAIT</label>
+			<label kind="synchronisation" x="4972" y="1292">vehicle_arrive!</label>
+			<label kind="assignment" x="4760" y="1105">vehicleMove[generatedVehicle] = generatedMove,
+vehicleActive[generatedVehicle] = true,
+vehicleRequest[generatedVehicle] = generatedMove,
+requestPending[generatedVehicle] = true,
+waitTime[generatedVehicle] = 0,
+cost[generatedVehicle] = (generatedMove == 1 || generatedMove == 2 || 
+generatedMove == 3 || generatedMove == 4) ? 1 : 2,
+generatedVehicle = (generatedVehicle == 3 ? 0 : generatedVehicle + 1),
+generatedMove = (generatedMove == 12 ? 1 : generatedMove + 1)</label>
+			<nail x="4692" y="1292"/>
+			<nail x="5372" y="1292"/>
+		</transition>
+		<transition id="id3">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="assignment" x="4947" y="1496">queue_len = queue_len + 1</label>
+			<nail x="5372" y="1496"/>
+			<nail x="4692" y="1496"/>
+		</transition>
+	</template>
+	<template>
+		<name>Vehicle</name>
+		<parameter>int vid</parameter>
+		<location id="id4" x="-510" y="-68">
+			<name x="-544" y="-102">idle</name>
+		</location>
+		<location id="id5" x="-34" y="-68">
+			<name x="-17" y="-102">Request</name>
+		</location>
+		<location id="id6" x="-34" y="102">
+			<name x="-17" y="68">waiting</name>
+		</location>
+		<location id="id7" x="-510" y="102">
+			<name x="-561" y="68">Done</name>
+		</location>
+		<init ref="id4"/>
+		<transition id="id8">
+			<source ref="id7"/>
+			<target ref="id4"/>
+		</transition>
+		<transition id="id9">
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-365" y="102">vehicleActive[vid] == false</label>
+		</transition>
+		<transition id="id10">
+			<source ref="id5"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-25" y="8">vehicle_arrive!</label>
+		</transition>
+		<transition id="id11">
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-400" y="-93">vehicleActive[vid] == true</label>
+			<label kind="assignment" x="-408" y="-59">vehicleRequest[vid] = vehicleMove[vid],
+requestPending[vid] = true</label>
+		</transition>
+	</template>
+	<template>
+		<name>QueueManager</name>
+		<location id="id12" x="-136" y="76">
+			<name x="-195" y="34">Waiting</name>
+		</location>
+		<location id="id13" x="190" y="80">
+			<name x="180" y="50">Select</name>
+		</location>
+		<init ref="id12"/>
+		<transition id="id14">
+			<source ref="id12"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-25" y="136">request_next!</label>
+			<nail x="-42" y="136"/>
+			<nail x="102" y="136"/>
+		</transition>
+		<transition id="id15">
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<nail x="102" y="-8"/>
+			<nail x="-42" y="-8"/>
+		</transition>
+	</template>
+	<template>
+		<name>Scheduler</name>
+		<location id="id16" x="-42" y="76">
+			<name x="-52" y="46">Idle</name>
+		</location>
+		<location id="id17" x="850" y="76">
+			<name x="840" y="46">Compute</name>
+		</location>
+		<location id="id18" x="850" y="612">
+			<name x="867" y="586">Propose</name>
+		</location>
+		<location id="id19" x="-42" y="612">
+			<name x="-85" y="578">Wait</name>
+		</location>
+		<init ref="id16"/>
+		<transition id="id20">
+			<source ref="id19"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-178" y="212">schedule_accept?</label>
+		</transition>
+		<transition id="id21">
+			<source ref="id18"/>
+			<target ref="id19"/>
+			<label kind="assignment" x="297" y="612">has_proposal = true</label>
+		</transition>
+		<transition id="id22">
+			<source ref="id16"/>
+			<target ref="id17"/>
+			<label kind="guard" x="93" y="51">emergency_flag == 0 &amp;&amp; queue_len &gt; 0 &amp;&amp; exists (i : int[0,3]) requestPending[i]</label>
+			<label kind="assignment" x="357" y="85">sched_clk = 0</label>
+		</transition>
+		<transition id="id23">
+			<source ref="id17"/>
+			<target ref="id18"/>
+			<label kind="guard" x="884" y="119">sched_clk &lt;= SCHED_DEADLINE &amp;&amp; system_busy == false</label>
+			<label kind="assignment" x="884" y="161">// ================= AGING UPDATE =================
+waitTime[0] = waitTime[0] + 1,
+waitTime[1] = waitTime[1] + 1,
+waitTime[2] = waitTime[2] + 1,
+waitTime[3] = waitTime[3] + 1,
+
+// ================= SCORE COMPUTATION =================
+score[0] = waitTime[0] - cost[0],
+score[1] = waitTime[1] - cost[1],
+score[2] = waitTime[2] - cost[2],
+score[3] = waitTime[3] - cost[3],
+
+//movement conflict cost awareness
+selectedVehicle =
+    (requestPending[0] &amp;&amp; score[0] &gt;= score[1] &amp;&amp; score[0] &gt;= score[2] &amp;&amp; score[0] &gt;= score[3]) ? 0 :
+    (requestPending[1] &amp;&amp; score[1] &gt;= score[2] &amp;&amp; score[1] &gt;= score[3]) ? 1 :
+    (requestPending[2] &amp;&amp; score[2] &gt;= score[3]) ? 2 :
+    (requestPending[3]) ? 3 : -1</label>
+		</transition>
+	</template>
+	<template>
+		<name>IntersectionController</name>
+		<location id="id24" x="-341" y="-136">
+			<name x="-391" y="-170">Free</name>
+		</location>
+		<location id="id25" x="1148" y="-136">
+			<name x="1157" y="-170">Reserve</name>
+		</location>
+		<location id="id26" x="1148" y="323">
+			<name x="1157" y="339">Execute</name>
+		</location>
+		<location id="id27" x="-341" y="324">
+			<name x="-416" y="331">Release</name>
+		</location>
+		<init ref="id24"/>
+		<transition id="id28">
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="guard" x="1233" y="51">vehicleRequest[selectedVehicle] == 3 ||
+vehicleRequest[selectedVehicle] == 6 ||
+vehicleRequest[selectedVehicle] == 7</label>
+			<label kind="synchronisation" x="1233" y="26">reserve_slot!</label>
+			<label kind="assignment" x="1233" y="111">Q4 = true,
+Q3 = true</label>
+			<nail x="1199" y="102"/>
+		</transition>
+		<transition id="id29">
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="guard" x="212" y="59">vehicleRequest[selectedVehicle] == 1 ||
+vehicleRequest[selectedVehicle] == 9 ||
+vehicleRequest[selectedVehicle] == 10</label>
+			<label kind="synchronisation" x="212" y="34">reserve_slot!</label>
+			<label kind="assignment" x="212" y="127">Q2 = true,
+Q3 = true</label>
+			<nail x="553" y="85"/>
+		</transition>
+		<transition id="id30">
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="guard" x="1666" y="51">vehicleRequest[selectedVehicle] == 4 ||
+vehicleRequest[selectedVehicle] == 5 ||
+vehicleRequest[selectedVehicle] == 8</label>
+			<label kind="synchronisation" x="1666" y="26">reserve_slot!</label>
+			<label kind="assignment" x="1666" y="111">Q2 = true,
+Q1 = true</label>
+			<nail x="1632" y="85"/>
+		</transition>
+		<transition id="id31">
+			<source ref="id24"/>
+			<target ref="id25"/>
+			<label kind="guard" x="-263" y="-255">queue_len &gt; 0 &amp;&amp; system_busy == false &amp;&amp; emergency_flag == 0 &amp;&amp; has_proposal == true &amp;&amp; selectedVehicle &gt;= 0 &amp;&amp; selectedVehicle &lt;= 3 &amp;&amp; 
+(((vehicleRequest[selectedVehicle] == 1 || vehicleRequest[selectedVehicle] == 9 || vehicleRequest[selectedVehicle] == 10) &amp;&amp; Q2 == false &amp;&amp; Q3 == false)||
+((vehicleRequest[selectedVehicle] ==  2 || vehicleRequest[selectedVehicle] == 11|| vehicleRequest[selectedVehicle] == 12) &amp;&amp; Q4 == false &amp;&amp; Q1 == false)||
+((vehicleRequest[selectedVehicle] ==  3 || vehicleRequest[selectedVehicle] == 6 || vehicleRequest[selectedVehicle] == 7)  &amp;&amp; Q4 == false &amp;&amp; Q3 == false) ||
+((vehicleRequest[selectedVehicle] ==  4 || vehicleRequest[selectedVehicle] == 5 || vehicleRequest[selectedVehicle] == 8)  &amp;&amp; Q2 == false &amp;&amp; Q1 == false))</label>
+			<label kind="synchronisation" x="272" y="-119">schedule_accept!</label>
+			<label kind="assignment" x="272" y="-93">exec_clk = 0,
+system_busy = true,
+has_proposal = false,
+queue_len = queue_len - 1</label>
+		</transition>
+		<transition id="id32">
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="guard" x="757" y="51">vehicleRequest[selectedVehicle] == 2  ||
+vehicleRequest[selectedVehicle] == 11 ||
+vehicleRequest[selectedVehicle] == 12</label>
+			<label kind="synchronisation" x="757" y="25">reserve_slot!</label>
+			<label kind="assignment" x="757" y="110">Q4 = true,
+Q1 = true</label>
+			<nail x="1097" y="102"/>
+		</transition>
+		<transition id="id33">
+			<source ref="id26"/>
+			<target ref="id27"/>
+			<label kind="guard" x="297" y="331">exec_clk &gt;= SLOT_TIME</label>
+		</transition>
+		<transition id="id34">
+			<source ref="id27"/>
+			<target ref="id24"/>
+			<label kind="assignment" x="-680" y="34">Q1 = false,
+Q2 = false,
+Q3 = false,
+Q4 = false,
+system_busy = false,
+vehicleRequest[selectedVehicle] = -1,
+requestPending[selectedVehicle] = false</label>
+		</transition>
+	</template>
+	<template>
+		<name>EmergencyHandler</name>
+		<location id="id35" x="-195" y="76">
+			<name x="-246" y="42">Normal</name>
+		</location>
+		<location id="id36" x="306" y="76">
+			<name x="296" y="46">Emergency</name>
+		</location>
+		<init ref="id35"/>
+		<transition id="id37">
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-42" y="-76">emergency_detect?</label>
+			<label kind="assignment" x="-42" y="-59">emergency_flag = 1,
+emergency_active = true</label>
+			<nail x="-76" y="-14"/>
+			<nail x="161" y="-14"/>
+		</transition>
+		<transition id="id38">
+			<source ref="id36"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-42" y="162">priority_override!</label>
+			<label kind="assignment" x="-42" y="187">emergency_flag = 0,
+emergency_active = false</label>
+			<nail x="162" y="153"/>
+			<nail x="-84" y="153"/>
+		</transition>
+	</template>
+	<system>V0 = Vehicle(0);
+V1 = Vehicle(1);
+V2 = Vehicle(2);
+V3 = Vehicle(3);
+system VehicleGenerator,  QueueManager, Scheduler, IntersectionController, EmergencyHandler, V0, V1, V2, V3;</system>
+	<queries>
+		<option key="--diagnostic" value="0"/>
+		<query>
+			<formula>A[] not (Scheduler.Compute &amp;&amp; sched_clk &gt; SCHED_DEADLINE)</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2026-06-13 13:41:32 +0200">
+				<option key="--diagnostic" value="0"/>
+			</result>
+		</query>
+		<query>
+			<formula>A[] (IntersectionController.Execute imply exec_clk &lt;= SLOT_TIME)</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
+			<result outcome="success" type="quality" timestamp="2026-06-16 10:19:55 +0200">
+				<option key="--diagnostic" value="0"/>
+			</result>
+		</query>
+	</queries>
+</nta>

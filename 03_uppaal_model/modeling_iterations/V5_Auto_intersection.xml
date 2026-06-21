@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// ================= MOVE → QUADRANT REQUIREMENTS =================
+// M1: Q2 + Q3
+// M2: Q4 + Q1
+// M3: Q4 + Q3
+// M4: Q2 + Q1
+
+// M5: Q2 + Q1
+// M6: Q4 + Q3
+// M7: Q4 + Q3
+// M8: Q2 + Q1
+
+// M9:  Q2 + Q3
+// M10: Q2 + Q3
+// M11: Q4 + Q1
+// M12: Q4 + Q1
+
+// ================= MOVEMENT → QUADRANT MAP =================
+// Each move defines required exclusive spatial resources
+
+const int M1 = 1;   // N→S
+const int M2 = 2;   // S→N
+const int M3 = 3;   // E→W
+const int M4 = 4;   // W→E
+
+const int M5 = 5;   // N→E
+const int M6 = 6;   // E→S
+const int M7 = 7;   // S→W
+const int M8 = 8;   // W→N
+
+const int M9  = 9;  // N→W
+const int M10 = 10; // W→S
+const int M11 = 11; // S→E
+const int M12 = 12; // E→N
+
+// ================= SCHEDULER STATE =================
+// rotates through M1–M12 safely
+//int moveIndex = 1;
+// ================= TIME =================
+clock t_tr1, t_tr2, t_tr3, t_tr4, t_tr5, t_tr6, t_tr7, t_tr8;
+clock wait_clk, exec_clk, comm_clk, sched_clk, switch_clk;
+
+// ================= CONSTANTS =================
+const int MAX_WAIT = 200;
+const int SLOT_TIME = 5;
+const int SCHED_DEADLINE = 2;
+const int SENSOR_PERIOD = 1;
+
+// ================= Z2 QUADRANTS =================
+bool Q1 = false;
+bool Q2 = false;
+bool Q3 = false;
+bool Q4 = false;
+
+// ================= STATE =================
+int[0,MAX_WAIT] queue_len = 0;         // vehicles waiting for service (not executing) -queue_len can never be less than 0+q ueue_len can never be greater than MAX_WAIT
+int emergency_flag = 0;
+bool system_busy = false;
+bool has_proposal;
+int requestedMove = -1;
+int generatedMove = 1;
+int requestedVehicle = -1;
+
+// ================= CHANNELS =================
+broadcast chan vehicle_arrive;
+broadcast chan request_next;
+
+broadcast chan schedule_propose;
+broadcast chan schedule_accept;
+broadcast chan schedule_reject;
+
+broadcast chan reserve_slot;
+broadcast chan execute;
+
+urgent broadcast chan emergency_detect;
+broadcast chan priority_override;
+
+bool emergency_active = false;
+const int MAX_VEHICLES = 4;
+
+int vehicleMove[MAX_VEHICLES];
+bool vehicleActive[MAX_VEHICLES];
+int generatedVehicle = 0;
+</declaration>
+	<template>
+		<name>VehicleGenerator</name>
+		<location id="id0" x="306" y="102">
+			<name x="262" y="72">Idle</name>
+		</location>
+		<location id="id1" x="1394" y="102">
+			<name x="1403" y="68">Generate</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id2">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="773" y="17">queue_len &lt; MAX_WAIT</label>
+			<label kind="synchronisation" x="790" y="0">vehicle_arrive!</label>
+			<label kind="assignment" x="569" y="-170">vehicleMove[generatedVehicle] = generatedMove,
+vehicleActive[generatedVehicle] = true,
+
+requestedVehicle = generatedVehicle,
+requestedMove = generatedMove,
+
+generatedVehicle = (generatedVehicle == 3 ? 0 : generatedVehicle + 1),
+generatedMove = (generatedMove == 12 ? 1 : generatedMove + 1)</label>
+			<nail x="510" y="0"/>
+			<nail x="1190" y="0"/>
+		</transition>
+		<transition id="id3">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="assignment" x="765" y="204">queue_len = queue_len + 1</label>
+			<nail x="1190" y="204"/>
+			<nail x="510" y="204"/>
+		</transition>
+	</template>
+	<template>
+		<name>QueueManager</name>
+		<location id="id4" x="-136" y="76">
+			<name x="-195" y="34">Waiting</name>
+		</location>
+		<location id="id5" x="190" y="80">
+			<name x="180" y="50">Select</name>
+		</location>
+		<init ref="id4"/>
+		<transition id="id6">
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-25" y="136">request_next!</label>
+			<nail x="-42" y="136"/>
+			<nail x="102" y="136"/>
+		</transition>
+		<transition id="id7">
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<nail x="102" y="-8"/>
+			<nail x="-42" y="-8"/>
+		</transition>
+	</template>
+	<template>
+		<name>Scheduler</name>
+		<location id="id8" x="-42" y="76">
+			<name x="-52" y="46">Idle</name>
+		</location>
+		<location id="id9" x="850" y="76">
+			<name x="840" y="46">Compute</name>
+		</location>
+		<location id="id10" x="850" y="357">
+			<name x="867" y="331">Propose</name>
+		</location>
+		<location id="id11" x="-42" y="357">
+			<name x="-85" y="323">Wait</name>
+		</location>
+		<init ref="id8"/>
+		<transition id="id12">
+			<source ref="id11"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-178" y="212">schedule_accept?</label>
+		</transition>
+		<transition id="id13">
+			<source ref="id10"/>
+			<target ref="id11"/>
+			<label kind="assignment" x="365" y="357">has_proposal = true</label>
+		</transition>
+		<transition id="id14">
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="guard" x="25" y="51">emergency_flag == 0 &amp;&amp; queue_len &gt; 0 &amp;&amp; requestedMove !=  -1 &amp;&amp; vehicleActive[requestedVehicle]</label>
+			<label kind="assignment" x="365" y="85">sched_clk = 0</label>
+		</transition>
+		<transition id="id15">
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="867" y="195">sched_clk &lt;= SCHED_DEADLINE &amp;&amp;
+system_busy == false</label>
+		</transition>
+	</template>
+	<template>
+		<name>IntersectionController</name>
+		<location id="id16" x="-341" y="-136">
+			<name x="-391" y="-170">Free</name>
+		</location>
+		<location id="id17" x="909" y="-136">
+			<name x="918" y="-170">Reserve</name>
+		</location>
+		<location id="id18" x="909" y="324">
+			<name x="918" y="340">Execute</name>
+		</location>
+		<location id="id19" x="-341" y="324">
+			<name x="-416" y="331">Release</name>
+		</location>
+		<init ref="id16"/>
+		<transition id="id20">
+			<source ref="id17"/>
+			<target ref="id18"/>
+			<label kind="guard" x="986" y="51">requestedMove == 3 ||
+requestedMove == 6 ||
+requestedMove == 7</label>
+			<label kind="synchronisation" x="986" y="26">reserve_slot!</label>
+			<label kind="assignment" x="986" y="111">Q4 = true,
+Q3 = true</label>
+			<nail x="960" y="93"/>
+		</transition>
+		<transition id="id21">
+			<source ref="id17"/>
+			<target ref="id18"/>
+			<label kind="guard" x="357" y="59">requestedMove == 1 ||
+requestedMove == 9 ||
+requestedMove == 10</label>
+			<label kind="synchronisation" x="357" y="34">reserve_slot!</label>
+			<label kind="assignment" x="357" y="127">Q2 = true,
+Q3 = true</label>
+			<nail x="527" y="85"/>
+		</transition>
+		<transition id="id22">
+			<source ref="id17"/>
+			<target ref="id18"/>
+			<label kind="guard" x="1300" y="42">requestedMove == 4 ||
+requestedMove == 5 ||
+requestedMove == 8</label>
+			<label kind="synchronisation" x="1300" y="17">reserve_slot!</label>
+			<label kind="assignment" x="1300" y="102">Q2 = true,
+Q1 = true</label>
+			<nail x="1266" y="76"/>
+			<nail x="918" y="314"/>
+		</transition>
+		<transition id="id23">
+			<source ref="id16"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-127" y="-246">queue_len &gt; 0 &amp;&amp; system_busy == false &amp;&amp; emergency_flag == 0 &amp;&amp; has_proposal == true &amp;&amp;
+(((requestedMove == 1 || requestedMove == 9 || requestedMove == 10) &amp;&amp; Q2 == false &amp;&amp; Q3 == false)||
+((requestedMove ==  2 || requestedMove == 11|| requestedMove == 12) &amp;&amp; Q4 == false &amp;&amp; Q1 == false)||
+((requestedMove ==  3 || requestedMove == 6 || requestedMove == 7) &amp;&amp; Q4 == false &amp;&amp; Q3 == false) ||
+((requestedMove ==  4 || requestedMove == 5 || requestedMove == 8) &amp;&amp; Q2 == false &amp;&amp; Q1 == false))</label>
+			<label kind="synchronisation" x="187" y="-127">schedule_accept!</label>
+			<label kind="assignment" x="187" y="-102">exec_clk = 0,
+system_busy = true,
+has_proposal = false,
+queue_len = queue_len - 1</label>
+		</transition>
+		<transition id="id24">
+			<source ref="id17"/>
+			<target ref="id18"/>
+			<label kind="guard" x="671" y="51">requestedMove == 2  ||
+requestedMove == 11 ||
+requestedMove == 12</label>
+			<label kind="synchronisation" x="671" y="25">reserve_slot!</label>
+			<label kind="assignment" x="671" y="110">Q4 = true,
+Q1 = true</label>
+			<nail x="858" y="93"/>
+		</transition>
+		<transition id="id25">
+			<source ref="id18"/>
+			<target ref="id19"/>
+			<label kind="guard" x="161" y="331">exec_clk &gt;= SLOT_TIME</label>
+		</transition>
+		<transition id="id26">
+			<source ref="id19"/>
+			<target ref="id16"/>
+			<label kind="assignment" x="-671" y="42">Q1 = false,
+Q2 = false,
+Q3 = false,
+Q4 = false,
+system_busy = false,
+vehicleActive[requestedVehicle] = false,
+requestedMove = -1</label>
+		</transition>
+	</template>
+	<template>
+		<name>EmergencyHandler</name>
+		<location id="id27" x="-195" y="76">
+			<name x="-246" y="42">Normal</name>
+		</location>
+		<location id="id28" x="306" y="76">
+			<name x="296" y="46">Emergency</name>
+		</location>
+		<init ref="id27"/>
+		<transition id="id29">
+			<source ref="id27"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-42" y="-76">emergency_detect?</label>
+			<label kind="assignment" x="-42" y="-59">emergency_flag = 1,
+emergency_active = true</label>
+			<nail x="-76" y="-14"/>
+			<nail x="161" y="-14"/>
+		</transition>
+		<transition id="id30">
+			<source ref="id28"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="-42" y="162">priority_override!</label>
+			<label kind="assignment" x="-42" y="187">emergency_flag = 0,
+emergency_active = false</label>
+			<nail x="162" y="153"/>
+			<nail x="-84" y="153"/>
+		</transition>
+	</template>
+	<system>system VehicleGenerator, QueueManager, Scheduler, IntersectionController, EmergencyHandler;
+</system>
+	<queries>
+		<option key="--diagnostic" value="0"/>
+		<query>
+			<formula>A[] not (Scheduler.Compute &amp;&amp; sched_clk &gt; SCHED_DEADLINE)</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2026-06-13 13:41:32 +0200">
+				<option key="--diagnostic" value="0"/>
+			</result>
+		</query>
+		<query>
+			<formula>A[] (IntersectionController.Execute imply exec_clk &lt;= SLOT_TIME)</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2026-06-16 07:24:03 +0200">
+				<option key="--diagnostic" value="0"/>
+			</result>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
+			<result outcome="success" type="quality" timestamp="2026-06-16 07:56:44 +0200">
+				<option key="--diagnostic" value="0"/>
+			</result>
+		</query>
+	</queries>
+</nta>
