@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>
+
+// ================= TIME =================
+clock t_tr1, t_tr2, t_tr3, t_tr4, t_tr5, t_tr6, t_tr7, t_tr8;
+clock wait_clk, exec_clk, comm_clk, sched_clk, switch_clk;
+
+// ================= CONSTANTS =================
+const int MAX_WAIT = 20;
+const int SLOT_TIME = 5;
+const int SCHED_DEADLINE = 2;
+const int SENSOR_PERIOD = 1;
+
+// ================= Z2 QUADRANTS =================
+bool Q1 = false;
+bool Q2 = false;
+bool Q3 = false;
+bool Q4 = false;
+
+// ================= STATE =================
+int queue_len = 0;
+int emergency_flag = 0;
+int schedule_valid = 0;
+int system_busy = 0;
+int currentMove = -1;
+
+// ================= CHANNELS =================
+broadcast chan vehicle_arrive;
+broadcast chan request_next;
+
+broadcast chan schedule_propose;
+broadcast chan schedule_accept;
+broadcast chan schedule_reject;
+
+broadcast chan reserve_slot;
+broadcast chan execute;
+
+urgent broadcast chan emergency_detect;
+broadcast chan priority_override;
+
+</declaration>
+	<template>
+		<name>VehicleGenerator</name>
+		<location id="id0" x="622" y="115">
+			<name x="578" y="85">Idle</name>
+		</location>
+		<location id="id1" x="1079" y="119">
+			<name x="1088" y="85">Generate</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id2">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="782" y="-8">vehicle_arrive!</label>
+			<nail x="756" y="17"/>
+			<nail x="935" y="17"/>
+		</transition>
+		<transition id="id3">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="assignment" x="748" y="212">queue_len = queue_len + 1</label>
+			<nail x="952" y="204"/>
+			<nail x="748" y="204"/>
+		</transition>
+	</template>
+	<template>
+		<name>QueueManager</name>
+		<location id="id4" x="-136" y="76">
+			<name x="-195" y="34">Waiting</name>
+		</location>
+		<location id="id5" x="190" y="80">
+			<name x="180" y="50">Select</name>
+		</location>
+		<init ref="id4"/>
+		<transition id="id6">
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-25" y="136">request_next!</label>
+			<nail x="-42" y="136"/>
+			<nail x="102" y="136"/>
+		</transition>
+		<transition id="id7">
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<nail x="102" y="-8"/>
+			<nail x="-42" y="-8"/>
+		</transition>
+	</template>
+	<template>
+		<name>Scheduler</name>
+		<location id="id8" x="-42" y="76">
+			<name x="-52" y="46">Idle</name>
+		</location>
+		<location id="id9" x="280" y="76">
+			<name x="270" y="46">Compute</name>
+		</location>
+		<location id="id10" x="280" y="357">
+			<name x="297" y="331">Propose</name>
+		</location>
+		<init ref="id8"/>
+		<transition id="id11">
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="assignment" x="59" y="59">sched_clk = 0</label>
+		</transition>
+		<transition id="id12">
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="314" y="144">queue_len &gt; 0 &amp;&amp; sched_clk &lt;= SCHED_DEADLINE</label>
+			<label kind="assignment" x="408" y="170">currentMove = 1</label>
+		</transition>
+		<transition id="id13">
+			<source ref="id10"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-34" y="212">schedule_propose!</label>
+			<label kind="assignment" x="-34" y="238">schedule_valid = 1</label>
+		</transition>
+	</template>
+	<template>
+		<name>IntersectionController</name>
+		<location id="id14" x="42" y="59">
+			<name x="32" y="29">Free</name>
+		</location>
+		<location id="id15" x="425" y="59">
+			<name x="415" y="29">Reserve</name>
+		</location>
+		<location id="id16" x="425" y="323">
+			<name x="459" y="297">Execute</name>
+		</location>
+		<location id="id17" x="42" y="323">
+			<name x="-25" y="289">Release</name>
+		</location>
+		<init ref="id14"/>
+		<transition id="id18">
+			<source ref="id14"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="165" y="-21">schedule_accept!</label>
+			<label kind="assignment" x="161" y="8">exec_clk = 0,
+system_busy = 1</label>
+		</transition>
+		<transition id="id19">
+			<source ref="id15"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="476" y="110">reserve_slot!</label>
+			<label kind="assignment" x="467" y="136">// minimal example locking (expand later per M1–M12)
+Q1 = true,
+Q2 = true</label>
+		</transition>
+		<transition id="id20">
+			<source ref="id16"/>
+			<target ref="id17"/>
+			<label kind="guard" x="161" y="331">exec_clk &gt;= SLOT_TIME</label>
+		</transition>
+		<transition id="id21">
+			<source ref="id17"/>
+			<target ref="id14"/>
+			<label kind="assignment" x="-93" y="127">Q1 = false,
+Q2 = false,
+system_busy = 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>EmergencyHandler</name>
+		<location id="id22" x="-195" y="76">
+			<name x="-246" y="42">Normal</name>
+		</location>
+		<location id="id23" x="306" y="76">
+			<name x="296" y="46">Emergency</name>
+		</location>
+		<init ref="id22"/>
+		<transition id="id24">
+			<source ref="id22"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-25" y="-49">emergency_detect?</label>
+			<label kind="assignment" x="-25" y="-34">emergency_flag = 1</label>
+			<nail x="-76" y="-6"/>
+			<nail x="161" y="-6"/>
+		</transition>
+		<transition id="id25">
+			<source ref="id23"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-25" y="152">priority_override!</label>
+			<label kind="assignment" x="-17" y="177">emergency_flag = 0</label>
+			<nail x="170" y="144"/>
+			<nail x="-76" y="144"/>
+		</transition>
+	</template>
+	<system>system VehicleGenerator, QueueManager, Scheduler, IntersectionController, EmergencyHandler;
+</system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] (system_busy imply (Q1 or Q2 or Q3 or Q4))</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2026-06-12 22:14:41 +0200">
+			</result>
+		</query>
+	</queries>
+</nta>
