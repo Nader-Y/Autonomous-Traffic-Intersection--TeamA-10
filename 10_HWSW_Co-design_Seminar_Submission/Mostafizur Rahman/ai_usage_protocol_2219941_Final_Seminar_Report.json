@@ -1,0 +1,308 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "2219941",
+  "course": "Electronic Engineering",
+  "milestone": "Final Seminar Report: Literature Review, Experiment, Code Generation, Modeling, and Critical Analysis",
+  "topic": "High-Level Synthesis for Multi-Core Systems",
+  "exported_at": "2026-07-13T13:46:48+00:00",
+  "entries": [
+    {
+      "id": "e-hls-01",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Understand the assigned High-Level Synthesis topic and determine the scientific scope and structure of the final five-page IEEE seminar report.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Analyze the main reference and the seminar requirements for High-Level Synthesis for Multi-Core Systems. Identify the mathematical foundations, formal problem description, scheduling algorithm, runtime and overhead analysis, C/C++ implementation, application example, RTL output, limitations, and suitable additional references.",
+      "ai_output_summary": "The AI proposed a report structure covering the HLS flow, data-flow graphs, ASAP/ALAP scheduling, mobility, PE partitioning, communication-aware scheduling, resource binding, runtime analysis, C/C++ implementation, an application example, RTL generation, limitations, and references.",
+      "verification": {
+        "actions": [
+          "Compared the proposed structure with the lecturer's seminar requirements.",
+          "Checked the HLS flow and terminology against Elliott, Coussy and Morawiec, Gupta et al., and De Micheli.",
+          "Checked the scheduling discussion against Paulin and Knight and Sllame and Drabek.",
+          "Checked the main resource-sharing claims against Casseau and Le Gal."
+        ],
+        "level": "multi-source-validation"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "The main reference studies timewise mutually exclusive multi-mode hardware rather than simultaneous multi-core execution.",
+          "Early drafts risked presenting multi-mode area results as direct multi-core benchmark results.",
+          "The final report therefore distinguishes clearly between multi-core parallel execution and multi-mode resource sharing."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Abstract; Sections I, II, III, VI, and References",
+        "usage_type": "literature-search-support",
+        "direct_text_reused": false
+      },
+      "reflection": "I learned that a relevant reference can support only part of a topic. The multi-mode paper is valuable for joint scheduling, binding, and path-cost analysis, but its experimental results must not be described as simultaneous multi-core results."
+    },
+    {
+      "id": "e-hls-02",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Develop the mathematical foundations and formal communication-aware multi-core HLS model used in the report.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Formally describe High-Level Synthesis for Multi-Core Systems using a data-flow graph, ASAP and ALAP bounds, mobility, partition, schedule, binding, communication delay, resource constraints, speedup, an objective function, and a communication-aware list-scheduling algorithm.",
+      "ai_output_summary": "The AI formulated the DFG G=(V,E), ASAP/ALAP mobility, the mappings for partition, schedule, binding and communication, dependency and resource constraints, a weighted optimization objective, a priority function using 1/(mobility+1), a communication-aware binding cost, and formal algorithm steps.",
+      "verification": {
+        "actions": [
+          "Checked each dependency equation for producer latency and cross-PE communication delay.",
+          "Verified that 1/(mobility+1) remains defined when mobility is zero.",
+          "Checked that resource constraints prevent simultaneous over-allocation.",
+          "Compared the path-aware binding cost with the main reference.",
+          "Separated feasibility and correctness from optimality."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "An earlier priority expression using 1/mobility was undefined for zero-mobility critical nodes.",
+          "The heuristic algorithm provides a valid schedule but does not prove global optimality.",
+          "Controller-area values from the main reference require wording that identifies them as multi-mode results."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Sections II and III; Equations (1)-(15); Algorithm 1",
+        "usage_type": "modeling-support",
+        "direct_text_reused": true
+      },
+      "reflection": "I learned to distinguish a correct feasible schedule from an optimal schedule. The formal model also showed that partitioning, scheduling, binding, and communication decisions are tightly coupled."
+    },
+    {
+      "id": "e-hls-03",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Implement and evaluate a small C++ list scheduler for the 12-node 2x2 matrix-multiplication data-flow graph.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Create a portable C++ list-scheduling example for a 2x2 matrix-multiplication DFG. Map ready operations to two processing elements, explain the output, compare the greedy assignment with a row-based partition, and identify any cross-PE communication.",
+      "ai_output_summary": "The AI supplied the Operation structure, predecessor-completion test, greedy scheduling loop, compilation command, schedule interpretation, and a row-based partition that keeps product-to-sum dependencies local.",
+      "verification": {
+        "actions": [
+          "Compiled and executed sched.cpp with g++.",
+          "Inspected the printed operation-to-step and operation-to-PE mapping.",
+          "Compared every addition with the locations of its producer multiplications.",
+          "Checked the row-based schedule against the assumed multiplication and addition latencies.",
+          "Recalculated the ideal speedup S(2)=12/6=2.0."
+        ],
+        "level": "empirical-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "The simplified code chooses the first free PE and does not implement the complete communication-aware binding score.",
+          "An early written interpretation of the scheduler output did not fully match the actual output.",
+          "The simplified per-step functional-unit model does not fully represent every possible multi-cycle initiation interval."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section IV-A, Section IV-B, Listing 1, and Table II",
+        "usage_type": "code-generation",
+        "direct_text_reused": true
+      },
+      "reflection": "Running the implementation showed why generated explanations must be checked against actual output. The greedy scheduler can create avoidable communication even when the arithmetic workload appears balanced."
+    },
+    {
+      "id": "e-hls-04",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Design, run, and interpret a POSIX-thread experiment that models multiple processing elements and measures practical speedup and overhead.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Create a Linux POSIX pthread matrix-multiplication experiment in which each thread represents one PE. Use row partitioning, test K=1,2,4 workers, report the median of six runs, calculate speedup and efficiency, and explain why the measured scaling is below ideal.",
+      "ai_output_summary": "The AI proposed the pthread implementation, CLOCK_MONOTONIC timing, row partitioning, six-run median reporting, the speedup and efficiency equations, and an interpretation involving synchronization, operating-system scheduling, and timer overhead.",
+      "verification": {
+        "actions": [
+          "Compiled matrix_pthread.c with gcc -O2 -pthread.",
+          "Executed the experiment on the stated AMD Ryzen 7 Linux machine.",
+          "Repeated the measurement six times and used median values.",
+          "Recalculated S(2)=1.70, S(4)=2.31, and efficiencies of 85.0% and 57.8%.",
+          "Checked that the report describes the experiment as a functional software model rather than cycle-accurate hardware."
+        ],
+        "level": "empirical-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "pthread_join and usleep are software analogues rather than real RTL communication and operator timing.",
+          "The measured overhead includes OS scheduling and timer granularity.",
+          "The experiment does not model memory-port contention or cycle-accurate interconnect arbitration."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section IV-C and Table III",
+        "usage_type": "verification-support",
+        "direct_text_reused": false
+      },
+      "reflection": "I learned that more workers can reduce runtime without producing proportional speedup. This provided experimental motivation for including communication and overhead terms in the formal objective."
+    },
+    {
+      "id": "e-hls-05",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Evaluate the area effect of resource sharing using two VHDL datapath versions synthesized in Vivado.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Explain the separate and shared VHDL datapath experiment for two mutually exclusive arithmetic modes. Calculate the LUT reduction from 262 to 212, relate the result to HLS allocation and binding, and state the limitations of the comparison.",
+      "ai_output_summary": "The AI explained the two arithmetic modes, the multiplexed shared multiplier, the 19.1% LUT reduction, and the relationship between operator reuse, multiplexing, controller cost, allocation, and binding.",
+      "verification": {
+        "actions": [
+          "Checked the Vivado utilization reports for the separate and shared designs.",
+          "Recalculated (262-212)/262 x 100 = 19.1%.",
+          "Confirmed that both versions use the same external interface and I/O count.",
+          "Compared the interpretation with the resource-sharing and interconnection-cost discussion in the main reference."
+        ],
+        "level": "empirical-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "The experiment uses mutually exclusive modes and therefore validates the area and binding principle, not simultaneous multi-PE execution.",
+          "The exact number of arithmetic units must be checked against the full VHDL, not only a short listing excerpt.",
+          "FPGA LUT savings are not directly equivalent to ASIC standard-cell savings."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section V-A and Table IV",
+        "usage_type": "verification-support",
+        "direct_text_reused": true
+      },
+      "reflection": "I learned that resource sharing is beneficial only when operation lifetimes or modes do not overlap, and that multiplexing and controller overhead can reduce the theoretical area saving."
+    },
+    {
+      "id": "e-hls-06",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Explain how the scheduled and bound multi-core design becomes an RTL netlist and connect the report's algorithm to VHDL components.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Describe the RTL output of the HLS flow for the matrix example. Explain functional units, registers, multiplexers, communication buffers, FSM controllers, and provide a small VHDL entity example.",
+      "ai_output_summary": "The AI described the per-PE RTL structure, the mapping of cut edges to buffers or communication elements, the relationship between schedule states and FSM control signals, and a representative shared-adder VHDL entity.",
+      "verification": {
+        "actions": [
+          "Compared the RTL structure with Coussy and Morawiec and the main Casseau and Le Gal reference.",
+          "Checked that the described components correspond to scheduling and binding decisions.",
+          "Verified that the row-based matrix partition requires no cross-PE product-to-sum buffers in the simplified example.",
+          "Checked the VHDL entity syntax during LaTeX compilation."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The entity skeleton is illustrative and is not a complete generated RTL design.",
+          "A realistic design would additionally require reset behavior, complete control logic, memory interfaces, and top-level interconnection."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section V-B",
+        "usage_type": "terminology-clarification",
+        "direct_text_reused": true
+      },
+      "reflection": "This interaction connected the abstract schedule and binding mappings to actual hardware components. It clarified that HLS output is a controlled RTL datapath, not simply translated C syntax."
+    },
+    {
+      "id": "e-hls-07",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Structure, revise, format, and technically review the final five-page IEEE report and disclose the use of AI.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Using the final presentation, main reference, experiments, code, and measured results, prepare a five-page IEEE-format report on High-Level Synthesis for Multi-Core Systems. Improve the organization and language, preserve the verified content, add limitations and an AI-use acknowledgment, and repair LaTeX compilation errors without changing the intended writing.",
+      "ai_output_summary": "The AI helped organize and revise the report, generated IEEE LaTeX, integrated equations, algorithms, listings, tables, citations, limitations, and acknowledgment text, and repaired malformed LaTeX environments and invisible Unicode-character errors.",
+      "verification": {
+        "actions": [
+          "Compared the final report with the primary references and recorded experiment outputs.",
+          "Checked equations, scheduler assumptions, measured values, percentages, tables, and limitations.",
+          "Compiled the LaTeX source with pdfLaTeX and inspected the PDF.",
+          "Corrected statements that mixed multi-mode and multi-core results.",
+          "Retained responsibility for the final wording and submission."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "Several intermediate LaTeX versions contained malformed environments and invisible U+200B characters.",
+          "Some generated prose overstated experimental conclusions or did not match the code output.",
+          "Adding the acknowledgment affected the page count and required layout review."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Whole report, especially structure, language revision, LaTeX formatting, limitations, and acknowledgment",
+        "usage_type": "text-revision",
+        "direct_text_reused": true
+      },
+      "reflection": "I learned to use AI output as a draft rather than as evidence. Equations, citations, code behavior, and measurements were verified separately, and I retained full responsibility for the final report."
+    },
+    {
+      "id": "e-hls-08",
+      "timestamp": "2026-07-13T13:46:48+00:00",
+      "parent_id": null,
+      "objective": "Obtain an additional language and structure review of the HLS seminar report using Claude.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "Unknown / not recorded"
+      },
+      "prompt": "Reconstructed purpose of the interaction: review the HLS seminar report for academic clarity, grammar, structure, and consistency while preserving the equations, experimental values, code behavior, and technical meaning. Replace this text with the exact original prompt if it is still available.",
+      "ai_output_summary": "Claude was used as an additional prose-editing aid. Suggestions concerned wording, organization, and readability. Only selected suggestions were retained after technical comparison with the references and measured results.",
+      "verification": {
+        "actions": [
+          "Compared retained suggestions with the equations, code, experiment logs, and cited sources.",
+          "Rejected language changes that altered technical meaning or numerical values.",
+          "Manually reviewed all retained edits."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "The exact Claude model and original prompt were not retained.",
+          "This is a retrospective entry and should be replaced with the exact record if available.",
+          "Language suggestions were not used as scientific evidence."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Language and structure review across the report",
+        "usage_type": "text-revision",
+        "direct_text_reused": false
+      },
+      "reflection": "Using a second AI tool showed that language suggestions vary between tools. Technical verification still had to rely on the references, source code, and experimental results."
+    }
+  ]
+}
