@@ -1,0 +1,235 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "2219941",
+  "course": "Electronic Engineering",
+  "milestone": "Final Seminar Report: Literature Review, Experiment, Image Generation, Modeling, and Critical Analysis",
+  "topic": "Multi-Core: Global Scheduling",
+  "exported_at": "2026-07-13T05:57:21+00:00",
+  "entries": [
+    {
+      "id": "e-45028cc2",
+      "timestamp": "2026-07-13T05:57:21+00:00",
+      "parent_id": null,
+      "objective": "Understand and synthesize the assigned research on multicore global scheduling, including G-EDF, P-EDF, EPOS, LITMUSRT, operating-system overhead, WCET inflation, assumptions, and limitations.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Analyze the assigned paper on implementation and evaluation of global and partitioned scheduling in a real-time operating system. Explain the periodic task model, G-EDF, P-EDF, EPOS versus LITMUSRT, the overhead sources, the WCET inflation formula, runtime complexity, assumptions, limitations, and how the material can be organized in a seminar report.",
+      "ai_output_summary": "The AI produced structured explanations of the task model, the two EDF scheduling paradigms, the EPOS and LITMUSRT implementation differences, the six overhead sources, the WCET inflation equations, algorithm pseudocode, trade-offs, scalability, and suggested report organization.",
+      "verification": {
+        "actions": [
+          "Compared the summary against the assigned Gracioli et al. paper.",
+          "Checked the EDF utilization statement against Liu and Layland.",
+          "Checked the overhead-accounting interpretation against Brandenburg.",
+          "Compared multiprocessor scheduling claims with the cited Goossens, Bertogna, and Bastoni references.",
+          "Corrected statements that were stronger than the evidence supported."
+        ],
+        "level": "multi-source-validation"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "Some early explanations treated Windows as equivalent to LITMUSRT; this was corrected to a qualitative transfer comparison.",
+          "The distinction between sufficient and necessary multiprocessor tests required correction.",
+          "Detailed numerical claims required direct citation to the primary paper."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Sections I–IV: Introduction, mathematical model, algorithms, runtime overhead, and reference evaluation",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": false
+      },
+      "reflection": "I learned that scheduling theory cannot be evaluated independently of the operating-system implementation. I also learned to separate results from the reference paper from conclusions supported only by my own local experiment."
+    },
+    {
+      "id": "e-7084c636",
+      "timestamp": "2026-07-13T05:57:21+00:00",
+      "parent_id": null,
+      "objective": "Design, run, troubleshoot, and interpret the Windows/Linux WCET experiment and Linux perf measurements.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Create and explain a reproducible CPU-bound experiment that measures the maximum observed execution time without load and with fifteen background workers. Help run the same test on Windows and Ubuntu, use Linux perf to collect context switches, CPU migrations, cache references, cache misses, cycles, and instructions, and interpret the results carefully.",
+      "ai_output_summary": "The AI supplied and explained the Python multiprocessing benchmark, Linux perf commands, troubleshooting steps for perf_event_paranoid and file paths, percentage calculations, a Windows/Linux comparison, and careful terminology for sampled WCET and aggregate system interference.",
+      "verification": {
+        "actions": [
+          "Executed the benchmark on the AMD Ryzen 7 7435HS under Windows and Ubuntu.",
+          "Recorded all ten no-load and ten loaded runs on each platform.",
+          "Ran perf stat and checked the reported counters.",
+          "Recalculated the WCET increases manually: 87.3% on Windows and 48.5% in the Linux perf run.",
+          "Confirmed that perf counters covered the complete program, including background workers."
+        ],
+        "level": "empirical-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "The first interpretation called the difference pure OS overhead; it was revised to combined WCET inflation under load and interference.",
+          "The first Linux no-load measurement showed a warm-up/outlier effect.",
+          "The ten-run maximum is a sampled WCET, not an analytical hard-real-time bound."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section V, Tables III–IV, and Fig. 1",
+        "usage_type": "code-generation",
+        "direct_text_reused": false
+      },
+      "reflection": "I learned the difference between a sampled maximum and a formally bounded WCET. The perf results also showed that system-level counters support an interference explanation but do not isolate individual context-switch, tick, IPI, or CPMD costs."
+    },
+    {
+      "id": "e-0629f7e8",
+      "timestamp": "2026-07-13T05:57:21+00:00",
+      "parent_id": null,
+      "objective": "Implement and verify a small UPPAAL model that transfers the measured WCET values into two-core G-EDF safe and deadline-miss cases.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Using two cores and two simultaneously released tasks under G-EDF, create one UPPAAL XML model containing a safe case and a miss case. Use the measured Linux values T1 = 309 ms and T2 = 458 ms, verify the chosen deadlines, avoid artificial deadlock, and provide the UPPAAL queries and expected verdicts.",
+      "ai_output_summary": "The AI produced and iteratively corrected an UPPAAL XML model with safe and miss automata, self-loops in terminal locations, measured timing constants, deadline guards, and nine verification queries. It also explained why G-EDF uses one global queue and why the 400 ms deadline exposes the WCET-inflation effect.",
+      "verification": {
+        "actions": [
+          "Opened the XML model in UPPAAL and simulated both cases.",
+          "Checked all verifier queries and recorded the green/true and red/false verdicts.",
+          "Confirmed that A[] !deadlock is true after terminal self-loops were added.",
+          "Confirmed that the final falsified property is expected because 458 ms exceeds the 400 ms deadline.",
+          "Checked that the model represents one global queue rather than two partitioned queues."
+        ],
+        "level": "empirical-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "An early model had an artificial final-state deadlock.",
+          "An early explanation incorrectly referred to two queues; G-EDF requires one global queue.",
+          "The model is a timing abstraction and not a complete implementation of arbitrary releases, preemptions, migrations, IPIs, EPOS, or LITMUSRT."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section VI, Table V, and Fig. 2",
+        "usage_type": "modeling-support",
+        "direct_text_reused": false
+      },
+      "reflection": "I learned that UPPAAL proves properties only for the behavior admitted by the model. The model formally shows the deadline consequence of the measured values, but it does not by itself prove the correctness of a complete multicore operating-system scheduler."
+    },
+    {
+      "id": "e-3dbcf2e8",
+      "timestamp": "2026-07-13T05:57:21+00:00",
+      "parent_id": null,
+      "objective": "Create clear visualizations for the measured WCET comparison and the two-core G-EDF deadline-miss timeline.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Create publication-ready figures for an IEEE report: a comparison of Windows and Linux sampled WCET with and without background load, and a two-core G-EDF timeline showing T1 = 309 ms, T2 = 458 ms, the 400 ms deadline, and the 58 ms miss region. Make the labels readable in a two-column paper.",
+      "ai_output_summary": "The AI generated the WCET comparison chart and G-EDF timeline, then regenerated the timeline after label overlap was detected. It also helped package the figure assets correctly so they appeared in the compiled PDF.",
+      "verification": {
+        "actions": [
+          "Compared every plotted number with the recorded experiment output.",
+          "Checked that T1 ends at 309 ms, T2 ends at 458 ms, and the deadline is at 400 ms.",
+          "Inspected the compiled IEEE PDF for legibility and label overlap.",
+          "Replaced the first unclear timeline with a corrected version."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "The first timeline had overlapping labels.",
+          "An earlier LaTeX build displayed filename placeholders because the figure assets were not embedded correctly.",
+          "The figures illustrate selected cases and must not be interpreted as a complete scheduler trace."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Figures 1 and 2",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "I learned that visual accuracy includes both correct values and readable presentation. I manually checked the generated figures and requested revisions when the first version was unclear."
+    },
+    {
+      "id": "e-5c8f9951",
+      "timestamp": "2026-07-13T05:57:21+00:00",
+      "parent_id": null,
+      "objective": "Structure, draft, revise, and format the final five-page IEEE seminar report while preserving the verified research and experimental results.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 / GPT-5.6 Thinking (session-dependent)"
+      },
+      "prompt": "Using the assigned research paper, final presentation, draft document, experiment outputs, Linux perf results, and UPPAAL verification, prepare a five-page IEEE-format report on Multi-Core: Global Scheduling. Improve the structure and language, keep the technical results accurate, add limitations and an AI-use acknowledgment, and fix LaTeX compilation problems.",
+      "ai_output_summary": "The AI proposed the report structure, drafted and revised prose, produced IEEE LaTeX, integrated equations, algorithms, tables, figures, citations, limitations, and the acknowledgment, and helped diagnose Unicode, figure-path, and compilation errors.",
+      "verification": {
+        "actions": [
+          "Compared the final report against the primary reference and the recorded experiment outputs.",
+          "Checked equations, task parameters, percentages, UPPAAL constants, and query verdicts.",
+          "Compiled the LaTeX source and inspected the complete PDF.",
+          "Reviewed citations and corrected unsupported or overly strong statements.",
+          "Retained responsibility for final wording and submission."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "Several generated drafts contained awkward grammar, duplicated phrases, invisible Unicode characters, and the title typo 'Schdeuling'.",
+          "Citation placement and the missing UPPAAL reference required manual review.",
+          "Some AI-generated wording was too polished or generic and required rewriting to reflect the actual work."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Whole report, especially organization, language revision, LaTeX formatting, and acknowledgment",
+        "usage_type": "text-revision",
+        "direct_text_reused": true
+      },
+      "reflection": "I learned to treat AI output as a draft rather than an authority. Technical claims, equations, citations, and experimental values were checked separately. AI improved organization and formatting, but the final scientific decisions and responsibility remained mine."
+    },
+    {
+      "id": "e-aa6ad797",
+      "timestamp": "2026-07-13T05:57:21+00:00",
+      "parent_id": null,
+      "objective": "Obtain an additional language and structure review of the seminar report using Claude.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "Unknown / not recorded"
+      },
+      "prompt": "Reconstructed purpose of the interaction: review the seminar report for academic clarity, structure, grammar, and consistency while preserving the experimental results and technical meaning. Replace this text with the exact original prompt if it is still available.",
+      "ai_output_summary": "Claude was used as an additional drafting and editing aid. Suggestions concerned wording, organization, and presentation. Only selected suggestions were retained after comparison with the research sources and the measured results.",
+      "verification": {
+        "actions": [
+          "Compared suggested changes with the final technical content and original references.",
+          "Rejected wording that altered numerical results, assumptions, or the distinction between sampled WCET and analytical WCET.",
+          "Manually reviewed all retained language changes."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "The exact Claude model and original prompt were not retained.",
+          "This entry documents the purpose of the interaction; the reconstructed prompt should be replaced if the original is available.",
+          "Language suggestions were not treated as scientific evidence."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Language and structure review across the report",
+        "usage_type": "text-revision",
+        "direct_text_reused": false
+      },
+      "reflection": "Using a second AI tool showed that different tools can suggest different wording, but neither replaces verification against the paper, experiment logs, and UPPAAL results."
+    }
+  ]
+}
