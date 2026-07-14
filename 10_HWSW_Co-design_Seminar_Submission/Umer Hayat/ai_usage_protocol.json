@@ -1,0 +1,138 @@
+{
+  "protocol_version": "1.0",
+  "student": {
+    "name": "Muhammad Umer Hayat",
+    "programme": "Electronic Engineering",
+    "institution": "Hochschule Hamm-Lippstadt"
+  },
+  "assignment": {
+    "module": "Hardware Software Codesign",
+    "topic": "Memory Optimisation in High-Level Synthesis",
+    "final_deliverables": [
+      "seminar paper",
+      "presentation",
+      "AI usage protocol"
+    ]
+  },
+  "declaration": {
+    "summary": "AI was used as a learning, structuring, drafting, and review assistant. The technical direction, source selection, final interpretation, and responsibility for the submitted work remain with the student.",
+    "not_used_for": [
+      "fabricating experimental results",
+      "inventing citations",
+      "copying text from the reference paper without reformulation",
+      "replacing student understanding of the topic"
+    ]
+  },
+  "source_material": [
+    {
+      "type": "primary reference paper",
+      "title": "High-level synthesis under I/O Timing and Memory constraints",
+      "authors": "Philippe Coussy, Gwenole Corre, Pierre Bomel, Eric Senn, Eric Martin",
+      "role_in_work": "Main technical basis for the paper, especially the modelling of I/O timing constraints, Memory Constraint Graphs, scheduling under memory constraints, and the FFT case study."
+    },
+    {
+      "type": "student presentation",
+      "title": "Memory Optimisation within High-Level Synthesis",
+      "role_in_work": "Used to keep the final paper consistent with the presentation structure, terminology, and key explanations."
+    },
+    {
+      "type": "example seminar paper",
+      "title": "High-Level Synthesis for Edge-AI Applications",
+      "role_in_work": "Used only as a style and formatting reference for academic structure, not as a technical source for the topic."
+    }
+  ],
+  "ai_workflow_log": [
+    {
+      "step": 1,
+      "task": "Initial topic understanding",
+      "prompt": "Explain the topic 'memory optimisation within High-Level Synthesis' in simple but technically accurate terms. Focus on why memory access can become a bottleneck even when enough arithmetic operators are available.",
+      "purpose": "To build a clear conceptual foundation before writing the seminar material.",
+      "student_action": "Compared the explanation with the reference paper and kept only the parts related to memory access, memory banks, conflicts, and HLS scheduling."
+    },
+    {
+      "step": 2,
+      "task": "Reference paper extraction",
+      "prompt": "Summarize the main contribution of the paper 'High-level synthesis under I/O Timing and Memory constraints'. Focus on the methodology for memory optimisation and avoid general background that is not needed for a five-page seminar paper.",
+      "purpose": "To identify the central contribution of the paper without copying its wording.",
+      "student_action": "Selected the Memory Constraint Graph, I/O timing constraints, scheduling, and FFT experiment as the main points for the final paper."
+    },
+    {
+      "step": 3,
+      "task": "Graph model clarification",
+      "prompt": "Explain the difference between SFG, ACG, IOCG, MCG, and GCG in the HLS methodology. Create a concise comparison that explains what each graph represents and why it is needed.",
+      "purpose": "To understand the formal models used in the reference paper and explain them in my own words.",
+      "student_action": "Converted the explanation into a structured background section and checked that each graph was used consistently."
+    },
+    {
+      "step": 4,
+      "task": "Memory Constraint Graph explanation",
+      "prompt": "Explain how a Memory Constraint Graph is constructed from a Signal Flow Graph and a memory mapping file. Include how it represents sequential access, random access, and memory conflicts.",
+      "purpose": "To prepare the core technical section of the paper and presentation.",
+      "student_action": "Used the explanation to write the section on Memory Constraint Graphs and adjusted the wording to fit the paper style."
+    },
+    {
+      "step": 5,
+      "task": "Scheduling explanation",
+      "prompt": "Explain how list scheduling changes when memory constraints are added. Describe what happens when two ready operations need the same memory bank and one of them has zero mobility.",
+      "purpose": "To understand the scheduling algorithm beyond a surface-level summary.",
+      "student_action": "Checked the explanation against the pseudocode in the source paper and used it to write the scheduling section."
+    },
+    {
+      "step": 6,
+      "task": "Sequential versus random access",
+      "prompt": "Compare sequential and random memory access in HLS scheduling. Explain why burst-mode access can reduce memory access cost and why the scheduler may prefer a sequential access order.",
+      "purpose": "To make the memory optimisation idea understandable using a practical engineering explanation.",
+      "student_action": "Included the concept in the paper and used it as one of the main presentation points."
+    },
+    {
+      "step": 7,
+      "task": "FFT experiment analysis",
+      "prompt": "Analyze the three FFT experiments from the paper. Explain the trade-off between memory banks, I/O buses, arithmetic operators, and latency. Do not only restate the table values. Explain which design is the best compromise and why.",
+      "purpose": "To create a critical evaluation of the experimental results instead of only summarizing them.",
+      "student_action": "Used the analysis to write the case study section and concluded that the third experiment is the best system-level trade-off."
+    },
+    {
+      "step": 8,
+      "task": "Paper structure planning",
+      "prompt": "Suggest a logical structure for a five-page IEEE-style seminar paper on 'Memory Optimisation in High-Level Synthesis'. The paper should be based on the Coussy et al. reference paper and should include background, method, scheduling, experiment, and critical discussion.",
+      "purpose": "To organize the paper into a coherent academic structure before drafting.",
+      "student_action": "Selected the final structure: introduction, background, constraint models, scheduling, FFT case study, critical discussion, and conclusion."
+    },
+    {
+      "step": 9,
+      "task": "Drafting support",
+      "prompt": "Draft a technical section explaining scheduling under memory constraints in academic but readable English. Keep the explanation suitable for an undergraduate hardware software codesign seminar and avoid overcomplicated phrasing.",
+      "purpose": "To obtain a first draft that could be edited into the final paper.",
+      "student_action": "Reviewed the draft, simplified some sentences, and aligned the wording with the terminology used in my presentation."
+    },
+    {
+      "step": 10,
+      "task": "Critical discussion",
+      "prompt": "Identify strengths, limitations, and possible future improvements of the HLS memory optimisation method. Focus on manual memory mapping, heuristic scheduling, scalability, and relevance to modern HLS tools.",
+      "purpose": "To add critical evaluation and show independent understanding rather than only repeating the original paper.",
+      "student_action": "Used the points to create the critical discussion section and related the old methodology to modern HLS directives such as array partitioning and dataflow."
+    },
+    {
+      "step": 11,
+      "task": "Consistency with presentation",
+      "prompt": "Compare the seminar paper structure with my presentation on memory optimisation in HLS. Check whether the main ideas match: memory bottleneck, HLS design flow, MCG, burst access, FFT experiment, strengths, limitations, and conclusion.",
+      "purpose": "To make sure the paper and presentation communicate the same technical story.",
+      "student_action": "Kept the same key message across both deliverables while making the paper more detailed than the slides."
+    },
+    {
+      "step": 12,
+      "task": "Final review",
+      "prompt": "Review the final paper draft for technical clarity, academic tone, repetition, and unsupported claims. Identify any sentence that sounds too vague or too strong and suggest a more precise version.",
+      "purpose": "To improve the final quality of the submission and reduce unclear claims.",
+      "student_action": "Checked the final text manually and ensured that the technical claims are supported by the reference paper or general HLS knowledge."
+    }
+  ],
+  "verification_actions": [
+    "Compared all key technical claims with the primary reference paper.",
+    "Used the FFT table values exactly as reported in the source paper.",
+    "Kept the example paper only as a formatting reference, not as a source of technical claims.",
+    "Reviewed the final terminology so that the presentation and paper use consistent names for SFG, ACG, IOCG, MCG, and GCG.",
+    "Avoided adding experimental results that were not present in the reference material."
+  ],
+  "final_student_responsibility": "The submitted paper should be reviewed by the student before submission. Any part that does not match the student's actual process, understanding, or course requirements should be edited before handing it in."
+}
