@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_intersection_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_intersection" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="81.488 ns"></ZoomStartTime>
+      <ZoomEndTime time="212.578 ns"></ZoomEndTime>
+      <Cursor1Time time="86.802 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="279"></NameColumnWidth>
+      <ValueColumnWidth column_width="128"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="8" />
+   <wvobject fp_name="/tb_intersection/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intersection/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intersection/req_id" type="other">
+      <obj_property name="ElementShortName">req_id</obj_property>
+      <obj_property name="ObjectShortName">req_id</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intersection/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intersection/grant" type="logic">
+      <obj_property name="ElementShortName">grant</obj_property>
+      <obj_property name="ObjectShortName">grant</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intersection/conflict" type="logic">
+      <obj_property name="ElementShortName">conflict</obj_property>
+      <obj_property name="ObjectShortName">conflict</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intersection/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intersection/quad_state" type="array">
+      <obj_property name="ElementShortName">quad_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">quad_state[3:0]</obj_property>
+   </wvobject>
+</wave_config>
