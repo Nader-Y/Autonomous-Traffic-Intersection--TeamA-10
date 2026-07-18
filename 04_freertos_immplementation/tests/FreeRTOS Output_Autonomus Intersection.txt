@@ -1,0 +1,219 @@
+=== ATLICS V13 (movement conflict-cost-aware 4D-argmax) starting ===
+[GEN ] vehicle 0 requests M1  (N->S ) cost=1 queue_len=1
+[SCHED] selected vehicle 0 (M1) score=0  [V0 wt=1 c=1 s=0 | V1 wt=1 c=0 s=1 | V2 wt=1 c=0 s=1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 0 M1  (N->S )  Q1=0 Q2=1 Q3=1 Q4=0
+        vehicle 0: idle -> Request -> waiting (M1)
+[GEN ] vehicle 1 requests M2  (S->N ) cost=1 queue_len=1
+        vehicle 1: idle -> Request -> waiting (M2)
+[GEN ] vehicle 2 requests M3  (E->W ) cost=1 queue_len=2
+        vehicle 2: idle -> Request -> waiting (M3)
+[GEN ] vehicle 3 requests M4  (W->E ) cost=1 queue_len=3
+        vehicle 3: idle -> Request -> waiting (M4)
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M2) score=0  [V0 wt=1 c=0 s=1 | V1 wt=1 c=1 s=0 | V2 wt=1 c=1 s=0 | V3 wt=1 c=1 s=0]
+[INTX] RESERVE vehicle 1 M2  (S->N )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 0 requests M5  (N->E ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 0 0 1] selected=1 ----
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M3) score=1  [V0 wt=1 c=2 s=-1 | V1 wt=1 c=0 s=1 | V2 wt=2 c=1 s=1 | V3 wt=2 c=1 s=1]
+[INTX] RESERVE vehicle 2 M3  (E->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 1 requests M6  (E->S ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M4) score=2  [V0 wt=2 c=2 s=0 | V1 wt=1 c=2 s=-1 | V2 wt=1 c=0 s=1 | V3 wt=3 c=1 s=2]
+[INTX] RESERVE vehicle 3 M4  (W->E )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 2 requests M7  (S->W ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 1 0 0] selected=3 ----
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M5) score=1  [V0 wt=3 c=2 s=1 | V1 wt=2 c=2 s=0 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 0 M5  (N->E )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 3 requests M8  (W->N ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M6) score=1  [V0 wt=1 c=0 s=1 | V1 wt=3 c=2 s=1 | V2 wt=2 c=2 s=0 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 1 M6  (E->S )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 0 requests M9  (N->W ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 0 1 1] selected=1 ----
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M7) score=1  [V0 wt=1 c=2 s=-1 | V1 wt=1 c=0 s=1 | V2 wt=3 c=2 s=1 | V3 wt=2 c=2 s=0]
+[INTX] RESERVE vehicle 2 M7  (S->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 1 requests M10 (W->S ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M8) score=1  [V0 wt=2 c=2 s=0 | V1 wt=1 c=2 s=-1 | V2 wt=1 c=0 s=1 | V3 wt=3 c=2 s=1]
+[INTX] RESERVE vehicle 3 M8  (W->N )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 2 requests M11 (S->E ) cost=2 queue_len=3
+[EMRG] *** emergency_detect: new proposals/reservations paused ***
+---- STATUS queue_len=3 busy=1 emergency=1 Q[1 1 0 0] selected=3 ----
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[GEN ] vehicle 3 requests M12 (E->N ) cost=2 queue_len=4
+[EMRG] priority_override: normal operation resumed
+[SCHED] selected vehicle 0 (M9) score=1  [V0 wt=3 c=2 s=1 | V1 wt=2 c=2 s=0 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 0 M9  (N->W )  Q1=0 Q2=1 Q3=1 Q4=0
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 1 1 0] selected=0 ----
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M10) score=1  [V0 wt=1 c=0 s=1 | V1 wt=3 c=2 s=1 | V2 wt=2 c=2 s=0 | V3 wt=2 c=2 s=0]
+[INTX] RESERVE vehicle 1 M10 (W->S )  Q1=0 Q2=1 Q3=1 Q4=0
+[GEN ] vehicle 0 requests M1  (N->S ) cost=1 queue_len=3
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M11) score=1  [V0 wt=1 c=1 s=0 | V1 wt=1 c=0 s=1 | V2 wt=3 c=2 s=1 | V3 wt=3 c=2 s=1]
+[INTX] RESERVE vehicle 2 M11 (S->E )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 1 requests M2  (S->N ) cost=1 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 0 0 1] selected=2 ----
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M12) score=2  [V0 wt=2 c=1 s=1 | V1 wt=1 c=1 s=0 | V2 wt=1 c=0 s=1 | V3 wt=4 c=2 s=2]
+[INTX] RESERVE vehicle 3 M12 (E->N )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 2 requests M3  (E->W ) cost=1 queue_len=3
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M1) score=2  [V0 wt=3 c=1 s=2 | V1 wt=2 c=1 s=1 | V2 wt=1 c=1 s=0 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 0 M1  (N->S )  Q1=0 Q2=1 Q3=1 Q4=0
+[GEN ] vehicle 3 requests M4  (W->E ) cost=1 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 1 1 0] selected=0 ----
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M2) score=2  [V0 wt=1 c=0 s=1 | V1 wt=3 c=1 s=2 | V2 wt=2 c=1 s=1 | V3 wt=1 c=1 s=0]
+[INTX] RESERVE vehicle 1 M2  (S->N )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 0 requests M5  (N->E ) cost=2 queue_len=3
+[EMRG] *** emergency_detect: new proposals/reservations paused ***
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[GEN ] vehicle 1 requests M6  (E->S ) cost=2 queue_len=4
+---- STATUS queue_len=4 busy=0 emergency=1 Q[0 0 0 0] selected=-1 ----
+[EMRG] priority_override: normal operation resumed
+[SCHED] selected vehicle 2 (M3) score=2  [V0 wt=1 c=2 s=-1 | V1 wt=1 c=2 s=-1 | V2 wt=3 c=1 s=2 | V3 wt=2 c=1 s=1]
+[INTX] RESERVE vehicle 2 M3  (E->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M4) score=2  [V0 wt=2 c=2 s=0 | V1 wt=2 c=2 s=0 | V2 wt=1 c=0 s=1 | V3 wt=3 c=1 s=2]
+[INTX] RESERVE vehicle 3 M4  (W->E )  Q1=1 Q2=1 Q3=0 Q4=0
+---- STATUS queue_len=2 busy=1 emergency=0 Q[1 1 0 0] selected=3 ----
+[GEN ] vehicle 2 requests M7  (S->W ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M5) score=1  [V0 wt=3 c=2 s=1 | V1 wt=3 c=2 s=1 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 0 M5  (N->E )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 3 requests M8  (W->N ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M6) score=2  [V0 wt=1 c=0 s=1 | V1 wt=4 c=2 s=2 | V2 wt=2 c=2 s=0 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 1 M6  (E->S )  Q1=0 Q2=0 Q3=1 Q4=1
+---- STATUS queue_len=2 busy=1 emergency=0 Q[0 0 1 1] selected=1 ----
+[GEN ] vehicle 0 requests M9  (N->W ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M7) score=1  [V0 wt=1 c=2 s=-1 | V1 wt=1 c=0 s=1 | V2 wt=3 c=2 s=1 | V3 wt=2 c=2 s=0]
+[INTX] RESERVE vehicle 2 M7  (S->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 1 requests M10 (W->S ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M8) score=1  [V0 wt=2 c=2 s=0 | V1 wt=1 c=2 s=-1 | V2 wt=1 c=0 s=1 | V3 wt=3 c=2 s=1]
+[INTX] RESERVE vehicle 3 M8  (W->N )  Q1=1 Q2=1 Q3=0 Q4=0
+---- STATUS queue_len=2 busy=1 emergency=0 Q[1 1 0 0] selected=3 ----
+[GEN ] vehicle 2 requests M11 (S->E ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M9) score=1  [V0 wt=3 c=2 s=1 | V1 wt=2 c=2 s=0 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 0 M9  (N->W )  Q1=0 Q2=1 Q3=1 Q4=0
+[GEN ] vehicle 3 requests M12 (E->N ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M10) score=1  [V0 wt=1 c=0 s=1 | V1 wt=3 c=2 s=1 | V2 wt=2 c=2 s=0 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 1 M10 (W->S )  Q1=0 Q2=1 Q3=1 Q4=0
+---- STATUS queue_len=2 busy=1 emergency=0 Q[0 1 1 0] selected=1 ----
+[GEN ] vehicle 0 requests M1  (N->S ) cost=1 queue_len=3
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M11) score=1  [V0 wt=1 c=1 s=0 | V1 wt=1 c=0 s=1 | V2 wt=3 c=2 s=1 | V3 wt=2 c=2 s=0]
+[INTX] RESERVE vehicle 2 M11 (S->E )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 1 requests M2  (S->N ) cost=1 queue_len=3
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M1) score=1  [V0 wt=2 c=1 s=1 | V1 wt=1 c=1 s=0 | V2 wt=1 c=0 s=1 | V3 wt=3 c=2 s=1]
+[INTX] RESERVE vehicle 0 M1  (N->S )  Q1=0 Q2=1 Q3=1 Q4=0
+---- STATUS queue_len=2 busy=1 emergency=0 Q[0 1 1 0] selected=0 ----
+[GEN ] vehicle 2 requests M3  (E->W ) cost=1 queue_len=3
+[EMRG] *** emergency_detect: new proposals/reservations paused ***
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[GEN ] vehicle 0 requests M4  (W->E ) cost=1 queue_len=4
+---- STATUS queue_len=4 busy=0 emergency=1 Q[0 0 0 0] selected=-1 ----
+[EMRG] priority_override: normal operation resumed
+[SCHED] selected vehicle 3 (M12) score=2  [V0 wt=1 c=1 s=0 | V1 wt=2 c=1 s=1 | V2 wt=1 c=1 s=0 | V3 wt=4 c=2 s=2]
+[INTX] RESERVE vehicle 3 M12 (E->N )  Q1=1 Q2=0 Q3=0 Q4=1
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M2) score=2  [V0 wt=2 c=1 s=1 | V1 wt=3 c=1 s=2 | V2 wt=2 c=1 s=1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 1 M2  (S->N )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 3 requests M5  (N->E ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 0 0 1] selected=1 ----
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M4) score=2  [V0 wt=3 c=1 s=2 | V1 wt=1 c=0 s=1 | V2 wt=3 c=1 s=2 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 0 M4  (W->E )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 1 requests M6  (E->S ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M3) score=3  [V0 wt=1 c=0 s=1 | V1 wt=1 c=2 s=-1 | V2 wt=4 c=1 s=3 | V3 wt=2 c=2 s=0]
+[INTX] RESERVE vehicle 2 M3  (E->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 0 requests M7  (S->W ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 0 1 1] selected=2 ----
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M5) score=1  [V0 wt=1 c=2 s=-1 | V1 wt=2 c=2 s=0 | V2 wt=1 c=0 s=1 | V3 wt=3 c=2 s=1]
+[INTX] RESERVE vehicle 3 M5  (N->E )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 2 requests M8  (W->N ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M6) score=1  [V0 wt=2 c=2 s=0 | V1 wt=3 c=2 s=1 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 1 M6  (E->S )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 3 requests M9  (N->W ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 0 1 1] selected=1 ----
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M7) score=1  [V0 wt=3 c=2 s=1 | V1 wt=1 c=0 s=1 | V2 wt=2 c=2 s=0 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 0 M7  (S->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 1 requests M10 (W->S ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M8) score=1  [V0 wt=1 c=0 s=1 | V1 wt=1 c=2 s=-1 | V2 wt=3 c=2 s=1 | V3 wt=2 c=2 s=0]
+[INTX] RESERVE vehicle 2 M8  (W->N )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 0 requests M11 (S->E ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 1 0 0] selected=2 ----
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M9) score=1  [V0 wt=1 c=2 s=-1 | V1 wt=2 c=2 s=0 | V2 wt=1 c=0 s=1 | V3 wt=3 c=2 s=1]
+[INTX] RESERVE vehicle 3 M9  (N->W )  Q1=0 Q2=1 Q3=1 Q4=0
+[GEN ] vehicle 2 requests M12 (E->N ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M10) score=1  [V0 wt=2 c=2 s=0 | V1 wt=3 c=2 s=1 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 1 M10 (W->S )  Q1=0 Q2=1 Q3=1 Q4=0
+[GEN ] vehicle 3 requests M1  (N->S ) cost=1 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 1 1 0] selected=1 ----
+[EMRG] *** emergency_detect: new proposals/reservations paused ***
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[GEN ] vehicle 1 requests M2  (S->N ) cost=1 queue_len=4
+---- STATUS queue_len=4 busy=0 emergency=1 Q[0 0 0 0] selected=-1 ----
+[EMRG] priority_override: normal operation resumed
+[SCHED] selected vehicle 0 (M11) score=1  [V0 wt=3 c=2 s=1 | V1 wt=1 c=1 s=0 | V2 wt=2 c=2 s=0 | V3 wt=1 c=1 s=0]
+[INTX] RESERVE vehicle 0 M11 (S->E )  Q1=1 Q2=0 Q3=0 Q4=1
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M2) score=1  [V0 wt=1 c=0 s=1 | V1 wt=2 c=1 s=1 | V2 wt=3 c=2 s=1 | V3 wt=2 c=1 s=1]
+[INTX] RESERVE vehicle 1 M2  (S->N )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 0 requests M3  (E->W ) cost=1 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 0 0 1] selected=1 ----
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[SCHED] selected vehicle 2 (M12) score=2  [V0 wt=1 c=1 s=0 | V1 wt=1 c=0 s=1 | V2 wt=4 c=2 s=2 | V3 wt=3 c=1 s=2]
+[INTX] RESERVE vehicle 2 M12 (E->N )  Q1=1 Q2=0 Q3=0 Q4=1
+[GEN ] vehicle 1 requests M4  (W->E ) cost=1 queue_len=3
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M1) score=3  [V0 wt=2 c=1 s=1 | V1 wt=1 c=1 s=0 | V2 wt=1 c=0 s=1 | V3 wt=4 c=1 s=3]
+[INTX] RESERVE vehicle 3 M1  (N->S )  Q1=0 Q2=1 Q3=1 Q4=0
+[GEN ] vehicle 2 requests M5  (N->E ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 1 1 0] selected=3 ----
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M3) score=2  [V0 wt=3 c=1 s=2 | V1 wt=2 c=1 s=1 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 0 M3  (E->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 3 requests M6  (E->S ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M4) score=2  [V0 wt=1 c=0 s=1 | V1 wt=3 c=1 s=2 | V2 wt=2 c=2 s=0 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 1 M4  (W->E )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 0 requests M7  (S->W ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 1 0 0] selected=1 ----
+[EMRG] *** emergency_detect: new proposals/reservations paused ***
+[INTX] RELEASE vehicle 1, intersection free, queue_len=3
+[GEN ] vehicle 1 requests M8  (W->N ) cost=2 queue_len=4
+---- STATUS queue_len=4 busy=0 emergency=1 Q[0 0 0 0] selected=-1 ----
+[EMRG] priority_override: normal operation resumed
+[SCHED] selected vehicle 2 (M5) score=1  [V0 wt=1 c=2 s=-1 | V1 wt=1 c=2 s=-1 | V2 wt=3 c=2 s=1 | V3 wt=2 c=2 s=0]
+[INTX] RESERVE vehicle 2 M5  (N->E )  Q1=1 Q2=1 Q3=0 Q4=0
+[INTX] RELEASE vehicle 2, intersection free, queue_len=3
+[SCHED] selected vehicle 3 (M6) score=1  [V0 wt=2 c=2 s=0 | V1 wt=2 c=2 s=0 | V2 wt=1 c=0 s=1 | V3 wt=3 c=2 s=1]
+[INTX] RESERVE vehicle 3 M6  (E->S )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 2 requests M9  (N->W ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[0 0 1 1] selected=3 ----
+[INTX] RELEASE vehicle 3, intersection free, queue_len=3
+[SCHED] selected vehicle 0 (M7) score=1  [V0 wt=3 c=2 s=1 | V1 wt=3 c=2 s=1 | V2 wt=1 c=2 s=-1 | V3 wt=1 c=0 s=1]
+[INTX] RESERVE vehicle 0 M7  (S->W )  Q1=0 Q2=0 Q3=1 Q4=1
+[GEN ] vehicle 3 requests M10 (W->S ) cost=2 queue_len=3
+[INTX] RELEASE vehicle 0, intersection free, queue_len=3
+[SCHED] selected vehicle 1 (M8) score=2  [V0 wt=1 c=0 s=1 | V1 wt=4 c=2 s=2 | V2 wt=2 c=2 s=0 | V3 wt=1 c=2 s=-1]
+[INTX] RESERVE vehicle 1 M8  (W->N )  Q1=1 Q2=1 Q3=0 Q4=0
+[GEN ] vehicle 0 requests M11 (S->E ) cost=2 queue_len=3
+---- STATUS queue_len=3 busy=1 emergency=0 Q[1 1 0 0] selected=1 ----
